@@ -26,6 +26,7 @@
   const gameIframe = document.getElementById('game-iframe');
   const backBtn = document.getElementById('back-btn');
   const currentGameTitle = document.getElementById('current-game-title');
+  const currentGameAi = document.getElementById('current-game-ai');
   const currentGameDifficulty = document.getElementById('current-game-difficulty');
   const currentGameTech = document.getElementById('current-game-tech');
   const reloadGameBtn = document.getElementById('reload-game-btn');
@@ -68,12 +69,14 @@
   function renderGallery() {
     const filteredGames = allGames.filter(game => {
       const matchesDifficulty = currentDifficultyFilter === 'all' || 
-        (game.dificultad && game.dificultad.toLowerCase() === currentDifficultyFilter.toLowerCase());
+        (game.dificultad && game.dificultad.toLowerCase() === currentDifficultyFilter.toLowerCase()) ||
+        (game.dificultad_creacion && game.dificultad_creacion.toLowerCase() === currentDifficultyFilter.toLowerCase());
       
       const query = searchQuery.toLowerCase().trim();
       const matchesSearch = !query || 
         game.titulo.toLowerCase().includes(query) ||
         game.descripcion.toLowerCase().includes(query) ||
+        (game.ia && game.ia.toLowerCase().includes(query)) ||
         (game.tecnologia && game.tecnologia.toLowerCase().includes(query));
 
       return matchesDifficulty && matchesSearch;
@@ -110,7 +113,8 @@
    * Genera el HTML para la tarjeta de un juego
    */
   function createGameCardHTML(game) {
-    const dificultad = (game.dificultad || 'normal').toLowerCase();
+    const dificultad = (game.dificultad || 'fácil').toLowerCase();
+    const dificultadCreacion = game.dificultad_creacion || game.dificultad || 'Fácil';
     const miniatura = game.miniatura || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="225" viewBox="0 0 400 225"><rect width="400" height="225" fill="%231e293b"/><text x="50%" y="50%" fill="%2394a3b8" dominant-baseline="middle" text-anchor="middle" font-size="20">Minijuego</text></svg>';
 
     return `
@@ -126,12 +130,17 @@
         </div>
         <div class="game-card-body">
           <div class="game-card-badges">
-            <span class="badge badge-difficulty" data-difficulty="${escapeHtml(dificultad)}">
-              ${escapeHtml(dificultad)}
+            ${game.ia ? `
+              <span class="badge badge-ai" title="Creado con Inteligencia Artificial">
+                🤖 ${escapeHtml(game.ia)}
+              </span>
+            ` : ''}
+            <span class="badge badge-difficulty" data-difficulty="${escapeHtml(dificultad)}" title="Dificultad de desarrollo / Esfuerzo">
+              🛠️ Creación: ${escapeHtml(dificultadCreacion)}
             </span>
             ${game.tecnologia ? `
-              <span class="badge badge-tech">
-                ${escapeHtml(game.tecnologia)}
+              <span class="badge badge-tech" title="Tecnología">
+                💻 ${escapeHtml(game.tecnologia)}
               </span>
             ` : ''}
           </div>
@@ -156,13 +165,18 @@
     // Actualizar metadata del visor
     currentGameTitle.textContent = game.titulo;
     
+    if (currentGameAi) {
+      currentGameAi.textContent = `🤖 ${game.ia || 'IA'}`;
+    }
+
     if (currentGameDifficulty) {
-      currentGameDifficulty.textContent = (game.dificultad || 'normal').toUpperCase();
-      currentGameDifficulty.setAttribute('data-difficulty', (game.dificultad || 'normal').toLowerCase());
+      const dificultadCreacion = game.dificultad_creacion || game.dificultad || 'Fácil';
+      currentGameDifficulty.textContent = `🛠️ Creación: ${dificultadCreacion}`;
+      currentGameDifficulty.setAttribute('data-difficulty', (game.dificultad || 'fácil').toLowerCase());
     }
 
     if (currentGameTech) {
-      currentGameTech.textContent = game.tecnologia || 'Web';
+      currentGameTech.textContent = `💻 ${game.tecnologia || 'Web'}`;
     }
 
     // Ruta al index.html del juego

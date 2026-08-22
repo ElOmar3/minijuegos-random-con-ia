@@ -2,9 +2,12 @@
   {
     "id": "neon-pong",
     "titulo": "Neon Pong Arcade",
-    "descripcion": "El clásico Pong arcade con estética retro neón, efectos visuales de partículas y contrincante IA.",
+    "descripcion": "El clásico Pong arcade con estética retro neón, IA táctica con predicción balística y partículas.",
     "dificultad": "fácil",
-    "tecnologia": "JavaScript puro / Canvas",
+    "dificultad_creacion": "Fácil",
+    "esfuerzo_ia": "Bajo (1/5)",
+    "ia": "Gemini 3.7 Flash",
+    "tecnologia": "JavaScript puro / Canvas / Web Audio",
     "carpeta": "games/neon-pong",
     "miniatura": "games/neon-pong/thumbnail.svg"
   }

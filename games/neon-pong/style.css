@@ -604,6 +604,30 @@ html, body {
   }
 }
 
+/* AI Credit Footer */
+.ai-credit-footer {
+  margin-top: 1.2rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  line-height: 1.4;
+}
+
+.ai-credit-footer strong {
+  color: #f1f5f9;
+}
+
+.credit-divider {
+  opacity: 0.4;
+}
+
 .hidden {
   display: none !important;
 }
+
