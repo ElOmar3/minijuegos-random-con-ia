@@ -1,38 +1,37 @@
 /* ==========================================================================
-   PORTAL DE MINIJUEGOS — ESTILOS GLOBALES DEL HUB
-   (Aislados únicamente a la interfaz del portal)
+   COSMOS ARCADE — ESTILOS GLOBALES CON TEMÁTICA ESPACIAL
+   (Diseño galáctico, glassmorphism, nebulosas y arquitectura modular)
    ========================================================================== */
 
 :root {
-  --bg-primary: #0a0e17;
-  --bg-secondary: #111827;
-  --bg-card: rgba(17, 24, 39, 0.75);
-  --bg-card-hover: rgba(31, 41, 55, 0.85);
-  --bg-overlay: #080c14;
-  
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-focus: #06b6d4;
-  --border-glow: rgba(6, 182, 212, 0.4);
+  --bg-space: #040711;
+  --bg-card: rgba(13, 20, 42, 0.72);
+  --bg-card-hover: rgba(22, 34, 70, 0.85);
+  --bg-panel: rgba(10, 15, 33, 0.88);
+  --bg-overlay: #02040a;
 
-  --text-primary: #f9fafb;
-  --text-secondary: #9ca3af;
-  --text-muted: #6b7280;
+  --border-subtle: rgba(255, 255, 255, 0.09);
+  --border-glow-cyan: rgba(0, 240, 255, 0.45);
+  --border-glow-purple: rgba(168, 85, 247, 0.45);
 
-  --accent-cyan: #06b6d4;
-  --accent-purple: #8b5cf6;
-  --accent-pink: #ec4899;
-  --accent-amber: #f59e0b;
-  --accent-emerald: #10b981;
-  --accent-rose: #f43f5e;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
 
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --radius-lg: 18px;
+  --cosmic-cyan: #00f0ff;
+  --cosmic-purple: #a855f7;
+  --cosmic-pink: #ec4899;
+  --cosmic-gold: #fbbf24;
+  --cosmic-emerald: #10b981;
+  --cosmic-rose: #f43f5e;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
   --radius-full: 9999px;
 
-  --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 25px rgba(6, 182, 212, 0.25);
-  --transition-normal: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-cosmic: 0 15px 35px -5px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 240, 255, 0.15);
+  --transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Reset & Base */
@@ -44,48 +43,76 @@
 
 html, body {
   min-height: 100vh;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+  background-color: var(--bg-space);
+  color: var(--text-main);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  line-height: 1.5;
+  line-height: 1.6;
   overflow-x: hidden;
 }
 
-/* Background Ambient Glows */
-.background-glow {
+/* ==========================================================================
+   CANVAS ESTELAR Y NEBULOSAS DE FONDO
+   ========================================================================== */
+
+.starfield-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.nebula {
   position: fixed;
   border-radius: 50%;
-  filter: blur(120px);
+  filter: blur(140px);
   pointer-events: none;
   z-index: 0;
-  opacity: 0.25;
+  opacity: 0.22;
+  animation: nebulaPulse 12s ease-in-out infinite alternate;
 }
 
-.glow-1 {
-  width: 500px;
-  height: 500px;
-  top: -150px;
-  left: 10%;
-  background: radial-gradient(circle, var(--accent-cyan), transparent 70%);
+.nebula-cyan {
+  width: 600px;
+  height: 600px;
+  top: -200px;
+  left: 5%;
+  background: radial-gradient(circle, var(--cosmic-cyan), transparent 70%);
 }
 
-.glow-2 {
+.nebula-purple {
+  width: 650px;
+  height: 650px;
+  top: 35%;
+  right: -100px;
+  background: radial-gradient(circle, var(--cosmic-purple), transparent 70%);
+  animation-delay: -4s;
+}
+
+.nebula-pink {
   width: 550px;
   height: 550px;
-  bottom: 5%;
-  right: 5%;
-  background: radial-gradient(circle, var(--accent-purple), transparent 70%);
+  bottom: -150px;
+  left: 25%;
+  background: radial-gradient(circle, var(--cosmic-pink), transparent 70%);
+  animation-delay: -8s;
+}
+
+@keyframes nebulaPulse {
+  0% { transform: scale(1) translate(0, 0); opacity: 0.18; }
+  100% { transform: scale(1.15) translate(30px, 20px); opacity: 0.28; }
 }
 
 /* ==========================================================================
-   HEADER & CONTROLS
+   HEADER & NAVEGACIÓN
    ========================================================================== */
 
 .portal-header {
   position: relative;
   z-index: 10;
-  padding: 2.5rem 1.5rem 1.5rem;
-  max-width: 1200px;
+  padding: 2rem 1.5rem 1.2rem;
+  max-width: 1240px;
   margin: 0 auto;
   border-bottom: 1px solid var(--border-subtle);
 }
@@ -96,40 +123,59 @@ html, body {
   align-items: center;
   flex-wrap: wrap;
   gap: 1.5rem;
-  margin-bottom: 2rem;
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.2rem;
+}
+
+.brand-badge-glow {
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(168, 85, 247, 0.2));
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
 }
 
 .brand-icon {
-  font-size: 2.5rem;
+  font-size: 2rem;
   line-height: 1;
-  filter: drop-shadow(0 0 12px var(--accent-purple));
+  filter: drop-shadow(0 0 10px var(--cosmic-cyan));
 }
 
 .brand-text h1 {
   font-size: 2.2rem;
-  font-weight: 800;
+  font-weight: 900;
   letter-spacing: -0.5px;
-  background: linear-gradient(135deg, #ffffff 30%, var(--accent-cyan) 100%);
+  line-height: 1.1;
+  background: linear-gradient(135deg, #ffffff 40%, var(--cosmic-cyan) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .brand-text h1 span {
-  background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-pink) 100%);
+  background: linear-gradient(135deg, var(--cosmic-cyan) 0%, var(--cosmic-purple) 50%, var(--cosmic-pink) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .tagline {
-  font-size: 0.95rem;
-  color: var(--text-secondary);
-  font-weight: 400;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.header-stats {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
 }
 
 .stat-badge {
@@ -137,28 +183,184 @@ html, body {
   align-items: center;
   gap: 0.6rem;
   padding: 0.6rem 1.1rem;
-  background: var(--bg-card);
-  backdrop-filter: blur(12px);
+  background: var(--bg-panel);
+  backdrop-filter: blur(14px);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-full);
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.stat-icon {
+  font-size: 1.1rem;
 }
 
 .stat-value {
-  font-weight: 700;
-  color: var(--accent-cyan);
-  background: rgba(6, 182, 212, 0.15);
-  padding: 0.15rem 0.55rem;
+  font-weight: 800;
+  color: var(--cosmic-cyan);
+  background: rgba(0, 240, 255, 0.12);
+  padding: 0.15rem 0.6rem;
   border-radius: var(--radius-full);
+  border: 1px solid rgba(0, 240, 255, 0.25);
 }
 
-/* Controls: Search & Filters */
+/* ==========================================================================
+   HERO SECTION: EXPLICACIÓN DEL PROYECTO
+   ========================================================================== */
+
+.hero-section {
+  position: relative;
+  z-index: 10;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 3.5rem 1.5rem 2.5rem;
+}
+
+.hero-content {
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 1.1rem;
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #e9d5ff;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cosmic-cyan);
+  box-shadow: 0 0 10px var(--cosmic-cyan);
+  animation: pulseDot 1.8s infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+.hero-title {
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+  margin-bottom: 1.2rem;
+  color: #ffffff;
+}
+
+.hero-title span {
+  background: linear-gradient(135deg, var(--cosmic-cyan) 0%, var(--cosmic-purple) 50%, var(--cosmic-pink) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-desc {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-bottom: 2.8rem;
+}
+
+.hero-desc strong {
+  color: #ffffff;
+}
+
+/* Pilares del Proyecto (Cards) */
+.project-pillars {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  text-align: left;
+  margin-top: 1.5rem;
+}
+
+.pillar-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.6rem;
+  display: flex;
+  gap: 1.2rem;
+  align-items: flex-start;
+  transition: var(--transition-smooth);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.pillar-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-glow-cyan);
+  background: var(--bg-card-hover);
+  box-shadow: var(--shadow-cosmic);
+}
+
+.pillar-icon {
+  font-size: 2.2rem;
+  line-height: 1;
+  flex-shrink: 0;
+  padding: 0.6rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+.pillar-info h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 0.4rem;
+  color: #ffffff;
+}
+
+.pillar-info p {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.pillar-info code {
+  background: rgba(0, 240, 255, 0.12);
+  color: var(--cosmic-cyan);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+/* ==========================================================================
+   CONTROLES: BÚSQUEDA Y FILTROS GALÁCTICOS
+   ========================================================================== */
+
+.controls-section {
+  position: relative;
+  z-index: 10;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+}
+
 .controls-container {
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
+  background: var(--bg-panel);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.2rem 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
 @media (min-width: 768px) {
@@ -172,110 +374,123 @@ html, body {
 .search-box {
   position: relative;
   flex: 1;
-  max-width: 420px;
+  max-width: 520px;
 }
 
 .search-icon {
   position: absolute;
-  left: 1rem;
+  left: 1.1rem;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 1rem;
-  color: var(--text-muted);
+  font-size: 1.1rem;
+  color: var(--text-dim);
   pointer-events: none;
 }
 
 .search-box input {
   width: 100%;
-  padding: 0.75rem 1rem 0.75rem 2.8rem;
-  background: var(--bg-secondary);
+  padding: 0.85rem 1rem 0.85rem 3rem;
+  background: rgba(4, 7, 17, 0.8);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  color: var(--text-primary);
+  color: var(--text-main);
   font-size: 0.95rem;
-  transition: var(--transition-normal);
+  transition: var(--transition-smooth);
   outline: none;
 }
 
 .search-box input:focus {
-  border-color: var(--border-focus);
-  box-shadow: var(--shadow-glow);
-  background: rgba(17, 24, 39, 0.95);
+  border-color: var(--cosmic-cyan);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.35);
+  background: rgba(6, 11, 25, 0.95);
 }
 
 .search-box input::placeholder {
-  color: var(--text-muted);
+  color: var(--text-dim);
 }
 
 .filter-chips {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.6rem;
   flex-wrap: wrap;
 }
 
 .chip {
-  padding: 0.55rem 1.1rem;
+  padding: 0.6rem 1.2rem;
   border-radius: var(--radius-full);
   border: 1px solid var(--border-subtle);
-  background: var(--bg-secondary);
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-  font-weight: 500;
+  background: rgba(4, 7, 17, 0.8);
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: var(--transition-normal);
+  transition: var(--transition-smooth);
   user-select: none;
 }
 
 .chip:hover {
-  color: var(--text-primary);
-  border-color: rgba(255, 255, 255, 0.2);
-  background: rgba(31, 41, 55, 0.8);
+  color: var(--text-main);
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(20, 30, 60, 0.8);
 }
 
 .chip.active {
-  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+  background: linear-gradient(135deg, var(--cosmic-cyan), var(--cosmic-purple));
   color: #ffffff;
   border-color: transparent;
-  box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
-  font-weight: 600;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.45);
+  font-weight: 700;
 }
 
 /* ==========================================================================
-   MAIN GALLERY & GRID
+   GALERÍA DE JUEGOS Y TARJETAS COSMICAS
    ========================================================================== */
 
 .portal-main {
   position: relative;
   z-index: 10;
-  max-width: 1200px;
+  max-width: 1240px;
   margin: 0 auto;
-  padding: 2.5rem 1.5rem 4rem;
+  padding: 2rem 1.5rem 4rem;
 }
 
 .games-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2.2rem;
 }
 
-/* Game Card */
+/* Tarjeta Cósmica */
 .game-card {
   background: var(--bg-card);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: var(--shadow-card);
-  transition: var(--transition-normal);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+  transition: var(--transition-smooth);
   position: relative;
 }
 
+.game-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-lg);
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.3), transparent 60%, rgba(168, 85, 247, 0.3));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
 .game-card:hover {
-  transform: translateY(-6px);
-  border-color: rgba(6, 182, 212, 0.4);
-  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.6), 0 0 25px rgba(6, 182, 212, 0.2);
+  transform: translateY(-8px) scale(1.01);
+  border-color: rgba(0, 240, 255, 0.5);
+  box-shadow: var(--shadow-cosmic);
   background: var(--bg-card-hover);
 }
 
@@ -283,7 +498,7 @@ html, body {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
-  background: #0f172a;
+  background: #02040a;
   overflow: hidden;
 }
 
@@ -291,15 +506,15 @@ html, body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s ease;
+  transition: transform 0.5s ease;
 }
 
 .game-card:hover .game-card-img {
-  transform: scale(1.05);
+  transform: scale(1.06);
 }
 
 .game-card-body {
-  padding: 1.4rem;
+  padding: 1.6rem;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -309,16 +524,25 @@ html, body {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-bottom: 0.9rem;
+  margin-bottom: 1rem;
 }
 
 .badge {
-  font-size: 0.72rem;
-  font-weight: 600;
-  text-transform: uppercase;
+  font-size: 0.74rem;
+  font-weight: 700;
   letter-spacing: 0.5px;
-  padding: 0.25rem 0.65rem;
+  padding: 0.3rem 0.75rem;
   border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.badge-ai {
+  background: rgba(168, 85, 247, 0.18);
+  color: #f3e8ff;
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.25);
 }
 
 .badge-difficulty {
@@ -327,53 +551,40 @@ html, body {
 
 .badge-difficulty[data-difficulty="fácil"] {
   background: rgba(16, 185, 129, 0.15);
-  color: var(--accent-emerald);
-  border-color: rgba(16, 185, 129, 0.3);
+  color: var(--cosmic-emerald);
+  border-color: rgba(16, 185, 129, 0.35);
 }
 
 .badge-difficulty[data-difficulty="medio"] {
-  background: rgba(245, 158, 11, 0.15);
-  color: var(--accent-amber);
-  border-color: rgba(245, 158, 11, 0.3);
+  background: rgba(251, 191, 36, 0.15);
+  color: var(--cosmic-gold);
+  border-color: rgba(251, 191, 36, 0.35);
 }
 
 .badge-difficulty[data-difficulty="difícil"] {
   background: rgba(244, 63, 94, 0.15);
-  color: var(--accent-rose);
-  border-color: rgba(244, 63, 94, 0.3);
-}
-
-.badge-ai {
-  background: rgba(168, 85, 247, 0.18);
-  color: #f3e8ff;
-  border: 1px solid rgba(168, 85, 247, 0.45);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  box-shadow: 0 0 10px rgba(168, 85, 247, 0.2);
+  color: var(--cosmic-rose);
+  border-color: rgba(244, 63, 94, 0.35);
 }
 
 .badge-tech {
-  background: rgba(6, 182, 212, 0.15);
+  background: rgba(0, 240, 255, 0.15);
   color: #a5f3fc;
-  border: 1px solid rgba(6, 182, 212, 0.35);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
+  border: 1px solid rgba(0, 240, 255, 0.35);
 }
 
 .game-card-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  color: var(--text-primary);
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin-bottom: 0.6rem;
+  color: #ffffff;
 }
 
 .game-card-desc {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  line-height: 1.45;
-  margin-bottom: 1.4rem;
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 1.6rem;
   flex: 1;
 }
 
@@ -386,22 +597,23 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.6rem;
-  padding: 0.75rem 1.2rem;
-  background: linear-gradient(135deg, var(--accent-cyan), #0284c7);
+  gap: 0.7rem;
+  padding: 0.85rem 1.4rem;
+  background: linear-gradient(135deg, var(--cosmic-cyan), #0284c7);
   color: #ffffff;
   border: none;
   border-radius: var(--radius-md);
-  font-weight: 600;
-  font-size: 0.95rem;
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
   cursor: pointer;
-  transition: var(--transition-normal);
-  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+  transition: var(--transition-smooth);
+  box-shadow: 0 4px 15px rgba(0, 240, 255, 0.35);
 }
 
 .btn-play:hover {
-  background: linear-gradient(135deg, #22d3ee, #0369a1);
-  box-shadow: 0 6px 20px rgba(6, 182, 212, 0.5);
+  background: linear-gradient(135deg, #38bdf8, #0369a1);
+  box-shadow: 0 6px 25px rgba(0, 240, 255, 0.6);
   transform: translateY(-2px);
 }
 
@@ -409,24 +621,25 @@ html, body {
   transform: translateY(0);
 }
 
-/* Loading & Empty States */
+/* Estados Vacíos y Carga */
 .loading-state, .empty-state {
   grid-column: 1 / -1;
   text-align: center;
-  padding: 4rem 1.5rem;
+  padding: 4.5rem 1.5rem;
   background: var(--bg-card);
   border: 1px dashed var(--border-subtle);
   border-radius: var(--radius-lg);
 }
 
 .spinner {
-  width: 44px;
-  height: 44px;
-  border: 3px solid rgba(6, 182, 212, 0.2);
-  border-top-color: var(--accent-cyan);
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(0, 240, 255, 0.2);
+  border-top-color: var(--cosmic-cyan);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
-  margin: 0 auto 1.2rem;
+  margin: 0 auto 1.4rem;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
 }
 
 @keyframes spin {
@@ -434,35 +647,38 @@ html, body {
 }
 
 .empty-icon {
-  font-size: 3.5rem;
+  font-size: 4rem;
   display: block;
-  margin-bottom: 1rem;
+  margin-bottom: 1.2rem;
+  filter: drop-shadow(0 0 15px var(--cosmic-purple));
 }
 
 .empty-state h3 {
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   margin-bottom: 0.5rem;
+  color: #ffffff;
 }
 
 .empty-state p {
-  color: var(--text-secondary);
-  margin-bottom: 1.5rem;
+  color: var(--text-muted);
+  margin-bottom: 1.8rem;
 }
 
 .btn-secondary {
-  padding: 0.65rem 1.3rem;
-  background: var(--bg-secondary);
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.08);
   border: 1px solid var(--border-subtle);
-  color: var(--text-primary);
+  color: var(--text-main);
   border-radius: var(--radius-md);
   cursor: pointer;
-  font-weight: 500;
-  transition: var(--transition-normal);
+  font-weight: 600;
+  transition: var(--transition-smooth);
 }
 
 .btn-secondary:hover {
-  border-color: var(--accent-cyan);
-  color: var(--accent-cyan);
+  border-color: var(--cosmic-cyan);
+  color: var(--cosmic-cyan);
+  background: rgba(0, 240, 255, 0.1);
 }
 
 .hidden {
@@ -470,7 +686,7 @@ html, body {
 }
 
 /* ==========================================================================
-   GAME OVERLAY / MODAL (FULL SCREEN IFRAME)
+   VISOR IFRAME A PANTALLA COMPLETA
    ========================================================================== */
 
 .game-overlay {
@@ -483,7 +699,7 @@ html, body {
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  animation: fadeIn 0.2s ease-out;
+  animation: fadeIn 0.25s ease-out;
 }
 
 @keyframes fadeIn {
@@ -493,13 +709,13 @@ html, body {
 
 .game-overlay-header {
   height: 64px;
-  background: rgba(17, 24, 39, 0.95);
-  backdrop-filter: blur(12px);
+  background: rgba(6, 10, 24, 0.95);
+  backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1.25rem;
+  padding: 0 1.5rem;
   flex-shrink: 0;
   z-index: 20;
 }
@@ -514,53 +730,54 @@ html, body {
 .btn-back {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.9rem;
+  gap: 0.6rem;
+  padding: 0.5rem 1rem;
   background: rgba(255, 255, 255, 0.08);
-  color: var(--text-primary);
+  color: var(--text-main);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: var(--transition-normal);
+  transition: var(--transition-smooth);
 }
 
 .btn-back:hover {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: var(--accent-cyan);
-  color: var(--accent-cyan);
-  transform: translateX(-2px);
+  background: rgba(0, 240, 255, 0.15);
+  border-color: var(--cosmic-cyan);
+  color: var(--cosmic-cyan);
+  transform: translateX(-3px);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
 }
 
 .shortcut-kbd {
-  background: rgba(0, 0, 0, 0.4);
-  padding: 0.15rem 0.4rem;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 0.15rem 0.45rem;
   border-radius: var(--radius-sm);
-  font-size: 0.65rem;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: var(--text-secondary);
+  font-size: 0.68rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-muted);
 }
 
 .game-title-group {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.2rem;
   white-space: nowrap;
 }
 
 .game-title-group h2 {
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 1.15rem;
+  font-weight: 800;
   color: #ffffff;
 }
 
 .game-meta-badges {
   display: none;
-  gap: 0.4rem;
+  gap: 0.5rem;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 768px) {
   .game-meta-badges {
     display: flex;
   }
@@ -569,28 +786,29 @@ html, body {
 .game-overlay-actions {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
 }
 
 .btn-action {
   background: rgba(255, 255, 255, 0.08);
-  color: var(--text-primary);
+  color: var(--text-main);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   cursor: pointer;
-  transition: var(--transition-normal);
+  transition: var(--transition-smooth);
 }
 
 .btn-action:hover {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: var(--accent-cyan);
-  color: var(--accent-cyan);
+  background: rgba(0, 240, 255, 0.15);
+  border-color: var(--cosmic-cyan);
+  color: var(--cosmic-cyan);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
 }
 
 .game-frame-wrapper {
@@ -616,8 +834,39 @@ html, body {
   position: relative;
   z-index: 10;
   text-align: center;
-  padding: 2rem 1rem;
+  padding: 3rem 1.5rem;
   border-top: 1px solid var(--border-subtle);
+  background: rgba(4, 7, 17, 0.85);
+  backdrop-filter: blur(14px);
+}
+
+.footer-content p {
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: 0.95rem;
+}
+
+.footer-content strong {
+  color: var(--cosmic-cyan);
+}
+
+.footer-sub {
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .hero-title {
+    font-size: 1.85rem;
+  }
+  .brand-text h1 {
+    font-size: 1.8rem;
+  }
+  .hero-section {
+    padding: 2.2rem 1.2rem 1.5rem;
+  }
+  .portal-main {
+    padding: 1.5rem 1rem 3rem;
+  }
 }
