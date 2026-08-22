@@ -1607,7 +1607,7 @@
       }
 
       // ============================================================================
-      // ENTRADAS DE USUARIO Y EVENTOS
+      // ENTRADAS DE USUARIO Y EVENTOS (RATÓN, TECLADO Y TÁCTIL)
       // ============================================================================
       function resetWorld() {
         hp = CFG.hpMax; stamina = CFG.stamMax; exhausted = false;
@@ -1626,8 +1626,8 @@
         refreshStats();
         refreshWeaponHUD();
         camera.position.set(0, CFG.eyeH, 23);
-        camera.quaternion.identity();
         lookEuler.set(0, 0, 0);
+        camera.quaternion.setFromEuler(lookEuler);
       }
 
       function beginPlay() {
@@ -1669,7 +1669,7 @@
       dom.btnResume.addEventListener('click', () => resumeGame());
 
       controls.addEventListener('unlock', () => {
-        if (phase === 'playing') pauseGame();
+        if (phase === 'playing' && !IS_TOUCH) pauseGame();
       });
 
       // Teclado
@@ -1688,23 +1688,33 @@
       document.addEventListener('keyup', e => { keys[e.code] = false; });
 
       // Ratón
+      let lmbDrag = false;
       document.addEventListener('mousedown', e => {
         AU.init(); AU.resume();
         if (IS_TOUCH || phase !== 'playing') return;
-        if (e.button === 0) { triggerDown = true; tryFire(); }
-        else if (e.button === 2) rmbDrag = true;
+        if (e.button === 0) {
+          triggerDown = true;
+          lmbDrag = true;
+          tryFire();
+        } else if (e.button === 2) {
+          rmbDrag = true;
+        }
       });
 
       document.addEventListener('mouseup', e => {
-        if (e.button === 0) triggerDown = false;
+        if (e.button === 0) { triggerDown = false; lmbDrag = false; }
         if (e.button === 2) rmbDrag = false;
       });
 
       document.addEventListener('mousemove', e => {
-        if (IS_TOUCH || phase !== 'playing' || controls.isLocked || !rmbDrag) return;
-        lookEuler.y -= e.movementX * 0.0022;
-        lookEuler.x = clamp(lookEuler.x - e.movementY * 0.0022, -1.45, 1.45);
-        camera.quaternion.setFromEuler(lookEuler);
+        if (IS_TOUCH || phase !== 'playing') return;
+        // Rotación de cámara suave tanto en PointerLock como en arrastre
+        if (controls.isLocked || rmbDrag || lmbDrag) {
+          const sens = 0.0022;
+          lookEuler.y -= e.movementX * sens;
+          lookEuler.x = clamp(lookEuler.x - e.movementY * sens, -1.45, 1.45);
+          camera.quaternion.setFromEuler(lookEuler);
+        }
       });
 
       document.addEventListener('contextmenu', e => e.preventDefault());
@@ -1714,10 +1724,9 @@
         if (typeof nipplejs !== 'undefined') {
           const mgr = nipplejs.create({
             zone: dom.joyZone,
-            mode: 'static',
-            position: { left: '80px', bottom: '80px' },
-            color: 'rgba(126, 200, 80, 0.65)',
-            size: 110
+            mode: 'dynamic',
+            color: 'rgba(126, 200, 80, 0.75)',
+            size: 100
           });
           mgr.on('move', (evt, data) => {
             if (data && data.vector) { joyX = data.vector.x; joyY = data.vector.y; }
@@ -1736,9 +1745,10 @@
               lastTouchY = t.clientY;
             }
           }
-        }, { passive: true });
+        }, { passive: false });
 
         dom.lookZone.addEventListener('touchmove', e => {
+          e.preventDefault();
           for (let i = 0; i < e.changedTouches.length; i++) {
             const t = e.changedTouches[i];
             if (t.identifier === touchLookId) {
@@ -1751,7 +1761,7 @@
               camera.quaternion.setFromEuler(lookEuler);
             }
           }
-        }, { passive: true });
+        }, { passive: false });
 
         const endTouch = e => {
           for (let i = 0; i < e.changedTouches.length; i++) {
@@ -1761,11 +1771,11 @@
         dom.lookZone.addEventListener('touchend', endTouch);
         dom.lookZone.addEventListener('touchcancel', endTouch);
 
-        dom.btnFire.addEventListener('touchstart', e => { e.preventDefault(); AU.init(); AU.resume(); triggerDown = true; tryFire(); });
-        dom.btnFire.addEventListener('touchend', e => { e.preventDefault(); triggerDown = false; });
-        dom.btnReload.addEventListener('touchstart', e => { e.preventDefault(); tryReload(); });
-        dom.btnSwitch.addEventListener('touchstart', e => { e.preventDefault(); cycleWeapon(); });
-        dom.btnSprint.addEventListener('touchstart', e => { e.preventDefault(); sprintTouch = !sprintTouch; dom.btnSprint.classList.toggle('active', sprintTouch); });
+        dom.btnFire.addEventListener('touchstart', e => { e.preventDefault(); AU.init(); AU.resume(); triggerDown = true; tryFire(); }, { passive: false });
+        dom.btnFire.addEventListener('touchend', e => { e.preventDefault(); triggerDown = false; }, { passive: false });
+        dom.btnReload.addEventListener('touchstart', e => { e.preventDefault(); tryReload(); }, { passive: false });
+        dom.btnSwitch.addEventListener('touchstart', e => { e.preventDefault(); cycleWeapon(); }, { passive: false });
+        dom.btnSprint.addEventListener('touchstart', e => { e.preventDefault(); sprintTouch = !sprintTouch; dom.btnSprint.classList.toggle('active', sprintTouch); }, { passive: false });
       }
 
       // ============================================================================
@@ -1780,20 +1790,38 @@
         tNow = now / 1000;
 
         if (phase === 'playing') {
-          // 1. Movimiento del jugador
-          let inputX = 0, inputZ = 0;
-          if (keys['KeyW'] || keys['ArrowUp']) inputZ -= 1;
-          if (keys['KeyS'] || keys['ArrowDown']) inputZ += 1;
-          if (keys['KeyA'] || keys['ArrowLeft']) inputX -= 1;
-          if (keys['KeyD'] || keys['ArrowRight']) inputX += 1;
+          // 1. Movimiento del jugador en la dirección de la cámara
+          const sinY = Math.sin(lookEuler.y);
+          const cosY = Math.cos(lookEuler.y);
+          // Vector adelante horizontal (mirando hacia -Z por defecto)
+          const fwdX = -sinY;
+          const fwdZ = -cosY;
+          // Vector derecha horizontal
+          const rgtX = cosY;
+          const rgtZ = -sinY;
+
+          let moveDirX = 0;
+          let moveDirZ = 0;
+
+          if (keys['KeyW'] || keys['ArrowUp']) { moveDirX += fwdX; moveDirZ += fwdZ; }
+          if (keys['KeyS'] || keys['ArrowDown']) { moveDirX -= fwdX; moveDirZ -= fwdZ; }
+          if (keys['KeyD'] || keys['ArrowRight']) { moveDirX += rgtX; moveDirZ += rgtZ; }
+          if (keys['KeyA'] || keys['ArrowLeft']) { moveDirX -= rgtX; moveDirZ -= rgtZ; }
 
           if (IS_TOUCH) {
-            inputX += joyX;
-            inputZ -= joyY;
+            // Mover con el joystick táctil según la orientación de la cámara
+            moveDirX += rgtX * joyX + fwdX * joyY;
+            moveDirZ += rgtZ * joyX + fwdZ * joyY;
           }
 
-          const isMoving = Math.hypot(inputX, inputZ) > 0.15;
-          const wantSprint = (keys['ShiftLeft'] || keys['ShiftRight'] || sprintTouch) && isMoving && inputZ < 0 && !exhausted;
+          const moveMag = Math.hypot(moveDirX, moveDirZ);
+          if (moveMag > 0.001) {
+            moveDirX /= Math.max(1, moveMag);
+            moveDirZ /= Math.max(1, moveMag);
+          }
+
+          const isMoving = moveMag > 0.12;
+          const wantSprint = (keys['ShiftLeft'] || keys['ShiftRight'] || sprintTouch) && isMoving && !exhausted;
 
           if (wantSprint && stamina > 0) {
             stamina = Math.max(0, stamina - CFG.stamDrain * dt);
@@ -1807,39 +1835,35 @@
           dom.staminaFill.style.width = (stamina / CFG.stamMax * 100) + '%';
 
           const moveSpeed = wantSprint ? CFG.sprint : CFG.walk;
-          const moveVec = new THREE.Vector3(inputX, 0, inputZ);
-          if (moveVec.lengthSq() > 1) moveVec.normalize();
-          moveVec.applyAxisAngle(new THREE.Vector3(0, 1, 0), lookEuler.y);
-
-          velX = lerp(velX, moveVec.x * moveSpeed, dt * CFG.accel);
-          velZ = lerp(velZ, moveVec.z * moveSpeed, dt * CFG.accel);
+          velX = lerp(velX, moveDirX * moveSpeed, dt * CFG.accel);
+          velZ = lerp(velZ, moveDirZ * moveSpeed, dt * CFG.accel);
 
           const nextPos = collideCircle(playerPos.x + velX * dt, playerPos.z + velZ * dt, CFG.pRadius);
           playerPos.x = nextPos[0];
           playerPos.z = nextPos[1];
 
-          // Pasos sonoros
+          // Pasos audibles
           if (isMoving) {
-            stepAcc += dt * (wantSprint ? 1.6 : 1.0) * 2.8;
+            stepAcc += dt * (wantSprint ? 1.6 : 1.0) * 3.0;
             if (stepAcc >= Math.PI) {
               stepAcc -= Math.PI;
               sfxStep(wantSprint ? 0.35 : 0.2);
             }
             bobPhase += dt * 9;
-            bobAmt = lerp(bobAmt, wantSprint ? 0.08 : 0.04, dt * 6);
+            bobAmt = lerp(bobAmt, wantSprint ? 0.07 : 0.035, dt * 6);
           } else {
             bobAmt = lerp(bobAmt, 0, dt * 8);
           }
 
           camera.position.set(playerPos.x, CFG.eyeH + Math.sin(bobPhase) * bobAmt, playerPos.z);
 
-          // 2. Control de disparo automático
+          // 2. Disparo continuo si es automático
           if (triggerDown && WEAPONS[currentWeapon].auto) {
             tryFire();
           }
           if (fireCd > 0) fireCd -= dt;
 
-          // 3. Control de recarga
+          // 3. Recarga
           if (reloading) {
             reloadT -= dt;
             if (reloadT <= 0) {
