@@ -10,5 +10,17 @@
     "tecnologia": "JavaScript puro / Canvas / Web Audio",
     "carpeta": "games/neon-pong",
     "miniatura": "games/neon-pong/thumbnail.svg"
+  },
+  {
+    "id": "brote-cero",
+    "titulo": "Brote Cero",
+    "descripcion": "FPS 3D de terror y supervivencia: sobrevive a oleadas de zombis con armas, linterna y audio posicional.",
+    "dificultad": "difícil",
+    "dificultad_creacion": "Difícil",
+    "esfuerzo_ia": "Alto (5/5)",
+    "ia": "0x Alpha + Gemini 3.7 Flash",
+    "tecnologia": "Three.js 3D / Web Audio / nipple.js",
+    "carpeta": "games/brote-cero",
+    "miniatura": "games/brote-cero/thumbnail.png"
   }
 ]

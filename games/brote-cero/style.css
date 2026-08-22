@@ -1,0 +1,470 @@
+/* ============================================================
+   BROTE CERO — FPS de terror y supervivencia
+   HUD responsive + esquema táctil (botones ≥48px)
+   ============================================================ */
+:root {
+  --blood: #c0392b;
+  --blood-dark: #7e1e14;
+  --toxic: #7ec850;
+  --bone: #d8d3c5;
+  --panel-bg: rgba(8, 10, 9, 0.55);
+  --panel-border: rgba(126, 200, 80, 0.35);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+  color: var(--bone);
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  overscroll-behavior: none;
+}
+
+.hidden { display: none !important; }
+
+#scene-container { position: fixed; inset: 0; }
+#scene-container canvas { display: block; }
+
+/* ============================ HUD ============================ */
+#hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.hud-panel {
+  position: absolute;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* Vida / resistencia */
+.hud-vitals {
+  top: calc(env(safe-area-inset-top, 0px) + 14px);
+  left: calc(env(safe-area-inset-left, 0px) + 14px);
+  min-width: min(260px, 42vw);
+}
+.bar-row { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+.bar-icon { font-size: 14px; width: 18px; text-align: center; filter: grayscale(20%); }
+.bar-track {
+  flex: 1;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.stamina-track { height: 7px; }
+.bar-fill {
+  height: 100%;
+  width: 100%;
+  border-radius: 6px;
+  transition: width 0.15s linear, background-color 0.3s;
+}
+.health-fill { background: linear-gradient(90deg, #27ae60, #6fe08a); }
+.health-fill.low    { background: linear-gradient(90deg, #e67e22, #f5b041); }
+.health-fill.critical { background: linear-gradient(90deg, var(--blood), #ff6b5b); animation: pulse-red 0.7s infinite alternate; }
+@keyframes pulse-red { from { opacity: 0.75; } to { opacity: 1; } }
+.stamina-fill { background: linear-gradient(90deg, #2980b9, #58c7f3); transition: width 0.08s linear; }
+.bar-num { font-size: 13px; font-weight: 700; min-width: 30px; text-align: right; }
+
+/* Oleada / bajas */
+.hud-stats {
+  top: calc(env(safe-area-inset-top, 0px) + 14px);
+  right: calc(env(safe-area-inset-right, 0px) + 14px);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.stat-block { display: flex; flex-direction: column; align-items: center; line-height: 1.1; }
+.stat-label { font-size: 10px; letter-spacing: 2px; color: rgba(216, 211, 197, 0.65); }
+.stat-value { font-size: 26px; font-weight: 800; color: var(--toxic); text-shadow: 0 0 8px rgba(126, 200, 80, 0.45); }
+.stat-value.kills { color: #ff7b6b; text-shadow: 0 0 8px rgba(255, 123, 107, 0.4); }
+.stat-divider { width: 1px; align-self: stretch; background: var(--panel-border); }
+
+/* Munición */
+.hud-ammo {
+  right: calc(env(safe-area-inset-right, 0px) + 14px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+#weapon-name { font-size: 11px; letter-spacing: 2.5px; color: rgba(216, 211, 197, 0.75); }
+#ammo-count { font-size: 30px; font-weight: 800; line-height: 1; }
+#ammo-count b { color: var(--toxic); }
+#ammo-count span { font-size: 18px; color: rgba(216, 211, 197, 0.7); }
+#ammo-count.dry b { color: var(--blood); animation: pulse-red 0.5s infinite alternate; }
+
+body.touch-mode .hud-ammo {
+  right: auto;
+  bottom: auto;
+  left: calc(env(safe-area-inset-left, 0px) + 14px);
+  top: calc(env(safe-area-inset-top, 0px) + 88px);
+  align-items: flex-start;
+}
+
+/* Aviso recarga */
+#reload-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 24%;
+  transform: translateX(-50%);
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #ffd166;
+  text-shadow: 0 0 10px rgba(255, 209, 102, 0.6), 0 2px 4px #000;
+  animation: blink-hint 0.8s infinite;
+}
+@keyframes blink-hint { 50% { opacity: 0.25; } }
+
+/* Banner oleadas */
+#banner {
+  position: absolute;
+  left: 50%;
+  top: 22%;
+  transform: translateX(-50%);
+  text-align: center;
+  font-size: clamp(22px, 4vw, 40px);
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: var(--toxic);
+  text-shadow: 0 0 18px rgba(126, 200, 80, 0.55), 0 3px 6px #000;
+  animation: banner-in 0.4s ease-out;
+  white-space: nowrap;
+}
+#banner.danger { color: #ff6b5b; text-shadow: 0 0 18px rgba(255, 107, 91, 0.6), 0 3px 6px #000; }
+@keyframes banner-in {
+  from { transform: translateX(-50%) scale(1.35); opacity: 0; }
+  to   { transform: translateX(-50%) scale(1);    opacity: 1; }
+}
+
+/* Toast de avisos (pickups) */
+#toast {
+  position: absolute;
+  left: 50%;
+  bottom: 34%;
+  transform: translateX(-50%);
+  font-size: clamp(14px, 2.4vw, 18px);
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--toxic);
+  background: rgba(8, 12, 9, 0.72);
+  border: 1px solid rgba(126, 200, 80, 0.45);
+  border-radius: 8px;
+  padding: 8px 18px;
+  text-shadow: 0 0 8px rgba(126, 200, 80, 0.5);
+  animation: toast-in 0.25s ease-out;
+  white-space: nowrap;
+}
+@keyframes toast-in { from { opacity: 0; transform: translateX(-50%) translateY(10px); } }
+
+/* Mira */
+#crosshair {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+}
+.ch { position: absolute; background: rgba(240, 240, 235, 0.85); box-shadow: 0 0 3px #000; }
+.ch-t { width: 2px; height: 8px; left: -1px; top: -14px; }
+.ch-b { width: 2px; height: 8px; left: -1px; top: 6px; }
+.ch-l { width: 8px; height: 2px; left: -14px; top: -1px; }
+.ch-r { width: 8px; height: 2px; left: 6px; top: -1px; }
+.ch-dot { position: absolute; width: 2px; height: 2px; left: -1px; top: -1px; background: rgba(240, 240, 235, 0.95); border-radius: 50%; }
+#crosshair.fire .ch { background: var(--blood); }
+
+/* Marcador de impacto */
+#hitmarker {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 26px;
+  height: 26px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  pointer-events: none;
+}
+#hitmarker::before, #hitmarker::after {
+  content: '';
+  position: absolute;
+  background: #fff;
+  box-shadow: 0 0 4px #000;
+}
+#hitmarker::before { left: 50%; top: 0; width: 2px; height: 100%; margin-left: -1px; }
+#hitmarker::after  { top: 50%; left: 0; height: 2px; width: 100%; margin-top: -1px; }
+#hitmarker.kill::before, #hitmarker.kill::after { background: var(--blood); }
+
+/* Viñeta roja vida baja */
+#vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 42%, rgba(120, 0, 0, 0.85) 100%);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+/* Flash de daño */
+#damage-flash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(255, 40, 20, 0.28), rgba(180, 0, 0, 0.5));
+  opacity: 0;
+}
+#damage-flash.hit { animation: dmg-flash 0.45s ease-out; }
+@keyframes dmg-flash { 0% { opacity: 1; } 100% { opacity: 0; } }
+
+/* ===================== Controles táctiles ===================== */
+#touch-ui { position: absolute; inset: 0; pointer-events: none; }
+
+#joystick-zone {
+  position: absolute;
+  left: 0; bottom: 0;
+  width: 46%;
+  height: 62%;
+  pointer-events: auto;
+}
+#look-zone {
+  position: absolute;
+  right: 0; bottom: 0;
+  width: 54%;
+  height: 78%;
+  pointer-events: auto;
+}
+
+#joystick-zone .nipple { z-index: 30; }
+
+.touch-buttons {
+  position: absolute;
+  right: calc(env(safe-area-inset-right, 0px) + 14px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 64px);
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 12px;
+  justify-items: center;
+  pointer-events: none;
+}
+.touch-btn {
+  pointer-events: auto;
+  width: 56px;
+  height: 56px;
+  min-width: 48px;
+  min-height: 48px;
+  border-radius: 50%;
+  border: 2px solid rgba(216, 211, 197, 0.4);
+  background: rgba(10, 12, 11, 0.55);
+  color: var(--bone);
+  font-size: 22px;
+  backdrop-filter: blur(3px);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.touch-btn:active, .touch-btn.active {
+  background: rgba(126, 200, 80, 0.35);
+  border-color: var(--toxic);
+  transform: scale(0.94);
+}
+.fire-btn {
+  width: 92px;
+  height: 92px;
+  font-size: 34px;
+  border-color: rgba(192, 57, 43, 0.75);
+  background: rgba(126, 30, 20, 0.5);
+  grid-column: span 2;
+  justify-self: end;
+}
+.fire-btn:active { background: rgba(192, 57, 43, 0.65); border-color: #ff6b5b; }
+
+/* Aviso de fallback sin Pointer Lock */
+#fallback-hint {
+  position: absolute;
+  left: 50%;
+  top: 58%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: rgba(216, 211, 197, 0.55);
+  background: rgba(8, 10, 9, 0.5);
+  border-radius: 6px;
+  padding: 4px 12px;
+  pointer-events: none;
+}
+
+.bar-fill.low-stam { filter: grayscale(0.7) brightness(0.7); }
+
+/* ========================= Overlays ========================= */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background:
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.28) 0 2px, transparent 2px 4px),
+    radial-gradient(ellipse at center, rgba(24, 34, 22, 0.88), rgba(2, 4, 3, 0.97));
+}
+.overlay-card {
+  max-width: 620px;
+  width: 100%;
+  max-height: 92vh;
+  overflow-y: auto;
+  text-align: center;
+  background: rgba(12, 15, 13, 0.92);
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  padding: clamp(20px, 4vh, 40px) clamp(18px, 4vw, 44px);
+  box-shadow: 0 0 60px rgba(126, 200, 80, 0.12), 0 20px 50px rgba(0, 0, 0, 0.8);
+}
+
+.ai-collab-badge {
+  display: inline-block;
+  margin-bottom: 14px;
+  padding: 6px 14px;
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  border-radius: 999px;
+  font-size: 12px;
+  color: #e9d5ff;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.25);
+}
+
+.ai-collab-badge strong {
+  color: #ffffff;
+}
+
+.game-title {
+  font-size: clamp(38px, 8vw, 64px);
+  font-weight: 900;
+  letter-spacing: 6px;
+  line-height: 1;
+  color: var(--bone);
+  text-shadow: 0 0 24px rgba(192, 57, 43, 0.55);
+}
+.game-title span {
+  color: var(--blood);
+  text-shadow: 0 0 26px rgba(192, 57, 43, 0.9);
+}
+.game-subtitle {
+  margin: 12px 0 20px;
+  font-size: clamp(13px, 2vw, 15px);
+  color: rgba(216, 211, 197, 0.75);
+  line-height: 1.5;
+}
+
+.big-btn {
+  pointer-events: auto;
+  min-height: 52px;
+  padding: 12px 44px;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #06110a;
+  background: linear-gradient(180deg, var(--toxic), #4e9636);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 0 22px rgba(126, 200, 80, 0.4), inset 0 -3px 0 rgba(0, 0, 0, 0.25);
+  transition: transform 0.12s, box-shadow 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+.big-btn:hover { transform: translateY(-2px); box-shadow: 0 0 32px rgba(126, 200, 80, 0.65), inset 0 -3px 0 rgba(0, 0, 0, 0.25); }
+.big-btn:active { transform: translateY(1px); }
+
+.controls-help {
+  margin-top: 22px;
+  border-top: 1px dashed rgba(216, 211, 197, 0.25);
+  padding-top: 14px;
+}
+.controls-help h3 { font-size: 12px; letter-spacing: 3px; color: rgba(216, 211, 197, 0.6); margin-bottom: 8px; }
+.controls-help ul { list-style: none; font-size: clamp(12px, 1.9vw, 14px); line-height: 2; color: rgba(216, 211, 197, 0.85); }
+kbd {
+  display: inline-block;
+  min-width: 22px;
+  padding: 1px 6px;
+  margin: 0 2px;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-bottom-width: 3px;
+  border-radius: 5px;
+  font-family: inherit;
+  font-size: 0.85em;
+  text-align: center;
+}
+.menu-tip {
+  margin-top: 18px;
+  font-size: 12px;
+  font-style: italic;
+  color: rgba(192, 57, 43, 0.85);
+}
+
+/* Pausa */
+.pause-msg { margin: 10px 0 18px; color: rgba(216, 211, 197, 0.7); font-size: 14px; }
+
+/* Game over */
+.dead-title {
+  font-size: clamp(30px, 7vw, 52px);
+  font-weight: 900;
+  letter-spacing: 5px;
+  color: var(--blood);
+  text-shadow: 0 0 30px rgba(192, 57, 43, 0.8);
+  animation: dead-shake 0.5s ease-out;
+}
+@keyframes dead-shake {
+  0% { transform: translate(6px, -4px); } 25% { transform: translate(-6px, 4px); }
+  50% { transform: translate(4px, 2px); } 75% { transform: translate(-3px, -2px); }
+  100% { transform: translate(0, 0); }
+}
+.dead-sub { margin: 8px 0 20px; color: rgba(216, 211, 197, 0.65); font-style: italic; }
+.final-stats {
+  display: flex;
+  justify-content: center;
+  gap: clamp(16px, 5vw, 40px);
+  margin-bottom: 24px;
+}
+.final-stat { display: flex; flex-direction: column; gap: 4px; }
+.fs-label { font-size: 10px; letter-spacing: 2px; color: rgba(216, 211, 197, 0.6); }
+.fs-value { font-size: clamp(30px, 6vw, 44px); font-weight: 900; color: var(--toxic); }
+.fs-value.best { color: #ffd166; }
+
+/* Rotación */
+.rotate-card { max-width: 380px; }
+.rotate-icon { font-size: 54px; animation: rotate-phone 1.6s ease-in-out infinite; margin-bottom: 8px; }
+@keyframes rotate-phone {
+  0%, 20% { transform: rotate(0deg); }
+  55%, 80% { transform: rotate(90deg); }
+  100% { transform: rotate(90deg); }
+}
+
+/* ==================== Modo móvil / responsive ==================== */
+@media (hover: none) and (pointer: coarse), (max-width: 700px) {
+  .hud-vitals { min-width: min(210px, 48vw); padding: 7px 10px; }
+  .stat-value { font-size: 20px; }
+  #ammo-count { font-size: 24px; }
+  .controls-help.desktop-only ul li kbd { font-size: 12px; }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  .menu-card { padding: 14px 30px; }
+  .game-subtitle { margin: 6px 0 12px; }
+  .controls-help { margin-top: 10px; padding-top: 8px; }
+  .controls-help ul { line-height: 1.7; }
+  .menu-tip { display: none; }
+  .overlay-card.gameover-card { padding: 14px 30px; }
+  .final-stats { margin-bottom: 14px; }
+}
