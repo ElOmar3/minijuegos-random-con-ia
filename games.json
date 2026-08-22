@@ -1,0 +1,11 @@
+[
+  {
+    "id": "neon-pong",
+    "titulo": "Neon Pong Arcade",
+    "descripcion": "El clásico Pong arcade con estética retro neón, efectos visuales de partículas y contrincante IA.",
+    "dificultad": "fácil",
+    "tecnologia": "JavaScript puro / Canvas",
+    "carpeta": "games/neon-pong",
+    "miniatura": "games/neon-pong/thumbnail.svg"
+  }
+]

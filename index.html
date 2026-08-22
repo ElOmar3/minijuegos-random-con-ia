@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal de Minijuegos | Arcade Hub</title>
+  <meta name="description" content="Colección de minijuegos web modulares e independientes.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="background-glow glow-1"></div>
+  <div class="background-glow glow-2"></div>
+
+  <!-- Portal Header -->
+  <header class="portal-header">
+    <div class="header-container">
+      <div class="brand">
+        <span class="brand-icon">🎮</span>
+        <div class="brand-text">
+          <h1>Arcade<span>Hub</span></h1>
+          <p class="tagline">Colección de Minijuegos Modulares</p>
+        </div>
+      </div>
+      
+      <div class="header-stats">
+        <div class="stat-badge">
+          <span class="stat-icon">🕹️</span>
+          <span class="stat-label">Juegos disponibles:</span>
+          <span id="game-count" class="stat-value">0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter & Search Bar -->
+    <div class="controls-container">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="search" id="search-input" placeholder="Buscar por título o tecnología..." autocomplete="off">
+      </div>
+
+      <div class="filter-chips" id="filter-chips">
+        <button class="chip active" data-difficulty="all">Todos</button>
+        <button class="chip" data-difficulty="fácil">Fácil</button>
+        <button class="chip" data-difficulty="medio">Medio</button>
+        <button class="chip" data-difficulty="difícil">Difícil</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content: Game Gallery -->
+  <main class="portal-main">
+    <section class="gallery-section">
+      <div id="games-grid" class="games-grid" aria-live="polite">
+        <!-- Las tarjetas se generan dinámicamente desde main.js -->
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Cargando catálogo de juegos...</p>
+        </div>
+      </div>
+
+      <div id="empty-state" class="empty-state hidden">
+        <span class="empty-icon">👾</span>
+        <h3>No se encontraron juegos</h3>
+        <p>Prueba con otros términos de búsqueda o selecciona otro filtro.</p>
+        <button id="reset-filters-btn" class="btn-secondary">Restablecer filtros</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Game View Modal / Overlay (Iframe Container) -->
+  <div id="game-overlay" class="game-overlay hidden" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="game-overlay-header">
+      <div class="game-overlay-info">
+        <button id="back-btn" class="btn-back" title="Volver a la galería (Esc)">
+          <span class="btn-icon">←</span>
+          <span>Volver</span>
+          <kbd class="shortcut-kbd">ESC</kbd>
+        </button>
+        <div class="game-title-group">
+          <h2 id="current-game-title">Nombre del Juego</h2>
+          <div class="game-meta-badges">
+            <span id="current-game-difficulty" class="badge badge-difficulty">Fácil</span>
+            <span id="current-game-tech" class="badge badge-tech">JavaScript puro</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-overlay-actions">
+        <button id="reload-game-btn" class="btn-action" title="Reiniciar juego" aria-label="Reiniciar juego">
+          <span>🔄</span>
+        </button>
+        <button id="fullscreen-btn" class="btn-action" title="Pantalla completa" aria-label="Pantalla completa">
+          <span>⛶</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="game-frame-wrapper" id="game-frame-wrapper">
+      <iframe 
+        id="game-iframe" 
+        class="game-iframe" 
+        src="about:blank"
+        title="Ventana del minijuego"
+        allow="autoplay; fullscreen; gamepad; xr-spatial-tracking"
+        loading="lazy">
+      </iframe>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="portal-footer">
+    <p>⚡ ArcadeHub — Arquitectura aislada por iframes. Cada juego es 100% independiente.</p>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>

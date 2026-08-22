@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Neon Pong Arcade</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="game-container" id="game-container">
+    <!-- Game Canvas -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- In-Game HUD -->
+    <header class="hud" id="hud">
+      <div class="hud-score-player">
+        <span class="player-label">JUGADOR</span>
+        <span class="score-value" id="player-score">0</span>
+      </div>
+
+      <div class="hud-center">
+        <div class="rally-counter" id="rally-counter">
+          <span class="rally-label">RALLY</span>
+          <span class="rally-value" id="rally-value">0</span>
+        </div>
+        <div class="high-score-display">
+          <span>RÉCORD: </span>
+          <strong id="high-score-value">0</strong>
+        </div>
+      </div>
+
+      <div class="hud-score-ai">
+        <span class="player-label">IA BOT</span>
+        <span class="score-value" id="ai-score">0</span>
+      </div>
+    </header>
+
+    <!-- Top Floating Controls -->
+    <div class="floating-controls">
+      <button id="sound-btn" class="icon-btn" title="Activar/Desactivar Sonido" aria-label="Sonido">
+        <span id="sound-icon">🔊</span>
+      </button>
+      <button id="pause-btn" class="icon-btn" title="Pausar (P)" aria-label="Pausa">
+        <span>⏸️</span>
+      </button>
+    </div>
+
+    <!-- Screen Overlays -->
+
+    <!-- 1. Start Menu Overlay -->
+    <div class="overlay" id="start-screen">
+      <div class="modal-card">
+        <h1 class="glow-title">NEON<span>PONG</span></h1>
+        <p class="subtitle">Desafía a la IA en una batalla retro-futurista</p>
+        
+        <div class="difficulty-picker">
+          <label>Dificultad de la IA:</label>
+          <div class="difficulty-buttons">
+            <button class="diff-btn active" data-diff="easy">Fácil</button>
+            <button class="diff-btn" data-diff="medium">Medio</button>
+            <button class="diff-btn" data-diff="hard">Experto</button>
+          </div>
+        </div>
+
+        <div class="controls-guide">
+          <div class="control-item">
+            <span class="key-tag">W / S</span> o <span class="key-tag">↑ / ↓</span> o <span class="key-tag">Mouse / Touch</span>
+            <p>Mover paleta</p>
+          </div>
+          <div class="control-item">
+            <span class="key-tag">P / Espacio</span>
+            <p>Pausar partida</p>
+          </div>
+        </div>
+
+        <button id="start-btn" class="btn-cta">¡COMENZAR PARTIDA!</button>
+      </div>
+    </div>
+
+    <!-- 2. Pause Overlay -->
+    <div class="overlay hidden" id="pause-screen">
+      <div class="modal-card">
+        <h2 class="glow-title-secondary">PARTIDA PAUSADA</h2>
+        <div class="modal-actions">
+          <button id="resume-btn" class="btn-cta">Continuar (P)</button>
+          <button id="restart-btn" class="btn-secondary">Reiniciar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Game Over Overlay -->
+    <div class="overlay hidden" id="gameover-screen">
+      <div class="modal-card">
+        <h2 id="gameover-title" class="glow-title-secondary">¡VICTORIA!</h2>
+        <p id="gameover-desc" class="subtitle">¡Has derrotado a la máquina!</p>
+        
+        <div class="stats-summary">
+          <div class="summary-box">
+            <span>Rally Máximo</span>
+            <strong id="summary-max-rally">0</strong>
+          </div>
+          <div class="summary-box">
+            <span>Marcador Final</span>
+            <strong id="summary-final-score">5 - 3</strong>
+          </div>
+        </div>
+
+        <button id="play-again-btn" class="btn-cta">JUGAR DE NUEVO</button>
+      </div>
+    </div>
+
+    <!-- Mobile Touch Controls Area (Indicators) -->
+    <div class="touch-zones" id="touch-zones">
+      <div class="touch-hint">Toca o arrastra verticalmente para mover la paleta</div>
+    </div>
+  </div>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>

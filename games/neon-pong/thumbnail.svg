@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#050813"/>
+      <stop offset="100%" stop-color="#0e172a"/>
+    </linearGradient>
+    <filter id="glow-cyan" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="glow-pink" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="glow-ball" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="450" fill="url(#bg)"/>
+
+  <!-- Grid overlay -->
+  <g stroke="rgba(255, 255, 255, 0.04)" stroke-width="1">
+    <line x1="0" y1="75" x2="800" y2="75"/>
+    <line x1="0" y1="150" x2="800" y2="150"/>
+    <line x1="0" y1="225" x2="800" y2="225"/>
+    <line x1="0" y1="300" x2="800" y2="300"/>
+    <line x1="0" y1="375" x2="800" y2="375"/>
+    <line x1="160" y1="0" x2="160" y2="450"/>
+    <line x1="320" y1="0" x2="320" y2="450"/>
+    <line x1="480" y1="0" x2="480" y2="450"/>
+    <line x1="640" y1="0" x2="640" y2="450"/>
+  </g>
+
+  <!-- Center dashed line -->
+  <line x1="400" y1="20" x2="400" y2="430" stroke="rgba(255, 255, 255, 0.15)" stroke-width="6" stroke-dasharray="14,14"/>
+
+  <!-- Scores -->
+  <text x="330" y="90" fill="#06b6d4" font-family="'Segoe UI', Roboto, sans-serif" font-size="64" font-weight="bold" text-anchor="middle" opacity="0.8">3</text>
+  <text x="470" y="90" fill="#ec4899" font-family="'Segoe UI', Roboto, sans-serif" font-size="64" font-weight="bold" text-anchor="middle" opacity="0.8">1</text>
+
+  <!-- Player Paddle (Left - Cyan) -->
+  <rect x="50" y="165" width="16" height="110" rx="8" fill="#06b6d4" filter="url(#glow-cyan)"/>
+
+  <!-- AI Paddle (Right - Pink) -->
+  <rect x="734" y="210" width="16" height="110" rx="8" fill="#ec4899" filter="url(#glow-pink)"/>
+
+  <!-- Ball Trail -->
+  <path d="M 280 240 Q 320 225 360 215" stroke="rgba(6, 182, 212, 0.3)" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <path d="M 330 225 Q 355 218 380 210" stroke="rgba(255, 255, 255, 0.5)" stroke-width="10" stroke-linecap="round" fill="none"/>
+
+  <!-- Ball -->
+  <circle cx="395" cy="205" r="14" fill="#ffffff" filter="url(#glow-ball)"/>
+  <circle cx="395" cy="205" r="9" fill="#22d3ee"/>
+
+  <!-- Title Badge -->
+  <rect x="250" y="375" width="300" height="42" rx="21" fill="rgba(15, 23, 42, 0.85)" stroke="rgba(6, 182, 212, 0.5)" stroke-width="1.5"/>
+  <text x="400" y="402" fill="#ffffff" font-family="'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="bold" letter-spacing="3" text-anchor="middle">NEON PONG ARCADE</text>
+</svg>
