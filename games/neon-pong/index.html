@@ -14,7 +14,10 @@
     <!-- In-Game HUD -->
     <header class="hud" id="hud">
       <div class="hud-score-player">
-        <span class="player-label">JUGADOR</span>
+        <div class="player-tag">
+          <span class="player-dot cyan"></span>
+          <span class="player-label">TÚ (AZUL)</span>
+        </div>
         <span class="score-value" id="player-score">0</span>
       </div>
 
@@ -30,7 +33,10 @@
       </div>
 
       <div class="hud-score-ai">
-        <span class="player-label">IA BOT</span>
+        <div class="player-tag">
+          <span class="player-dot pink"></span>
+          <span class="player-label">IA BOT (ROSA)</span>
+        </div>
         <span class="score-value" id="ai-score">0</span>
       </div>
     </header>
@@ -45,31 +51,63 @@
       </button>
     </div>
 
+    <!-- Mobile On-Screen Virtual Buttons (Opcional para jugar con botones o toque directo) -->
+    <div class="mobile-controls" id="mobile-controls">
+      <button class="mobile-btn" id="btn-touch-up" aria-label="Subir">▲</button>
+      <button class="mobile-btn" id="btn-touch-down" aria-label="Bajar">▼</button>
+    </div>
+
     <!-- Screen Overlays -->
 
     <!-- 1. Start Menu Overlay -->
     <div class="overlay" id="start-screen">
       <div class="modal-card">
         <h1 class="glow-title">NEON<span>PONG</span></h1>
-        <p class="subtitle">Desafía a la IA en una batalla retro-futurista</p>
+        <p class="subtitle">Duelo Arcade Retro — Llega a 5 puntos para ganar</p>
         
-        <div class="difficulty-picker">
-          <label>Dificultad de la IA:</label>
-          <div class="difficulty-buttons">
-            <button class="diff-btn active" data-diff="easy">Fácil</button>
-            <button class="diff-btn" data-diff="medium">Medio</button>
-            <button class="diff-btn" data-diff="hard">Experto</button>
+        <!-- Identificación clara de Jugadores -->
+        <div class="roles-guide">
+          <div class="role-box role-player">
+            <span class="role-badge cyan-badge">TÚ (JUGADOR)</span>
+            <div class="paddle-preview cyan-paddle"></div>
+            <p>Lado Izquierdo (Azul)</p>
+          </div>
+          <div class="vs-badge">VS</div>
+          <div class="role-box role-ai">
+            <span class="role-badge pink-badge">RIVAL (IA BOT)</span>
+            <div class="paddle-preview pink-paddle"></div>
+            <p>Lado Derecho (Rosa)</p>
           </div>
         </div>
 
-        <div class="controls-guide">
-          <div class="control-item">
-            <span class="key-tag">W / S</span> o <span class="key-tag">↑ / ↓</span> o <span class="key-tag">Mouse / Touch</span>
-            <p>Mover paleta</p>
+        <!-- Selector de Dificultad -->
+        <div class="difficulty-picker">
+          <label>Nivel de la Inteligencia Artificial:</label>
+          <div class="difficulty-buttons">
+            <button class="diff-btn active" data-diff="easy">
+              <strong>Fácil</strong>
+              <span>Casual</span>
+            </button>
+            <button class="diff-btn" data-diff="medium">
+              <strong>Medio</strong>
+              <span>Táctico</span>
+            </button>
+            <button class="diff-btn" data-diff="hard">
+              <strong>Experto</strong>
+              <span>Imbatible</span>
+            </button>
           </div>
-          <div class="control-item">
-            <span class="key-tag">P / Espacio</span>
-            <p>Pausar partida</p>
+        </div>
+
+        <!-- Guía de Controles Clara -->
+        <div class="controls-guide">
+          <div class="control-col">
+            <strong>💻 En Computadora</strong>
+            <p><span class="key-tag">W / S</span> o <span class="key-tag">↑ / ↓</span> o Ratón</p>
+          </div>
+          <div class="control-col">
+            <strong>📱 En Celular / Tablet</strong>
+            <p>Arrastra el dedo en pantalla o usa las flechas táctiles</p>
           </div>
         </div>
 
@@ -81,9 +119,10 @@
     <div class="overlay hidden" id="pause-screen">
       <div class="modal-card">
         <h2 class="glow-title-secondary">PARTIDA PAUSADA</h2>
+        <p class="subtitle">Tú (Azul) vs IA (Rosa)</p>
         <div class="modal-actions">
-          <button id="resume-btn" class="btn-cta">Continuar (P)</button>
-          <button id="restart-btn" class="btn-secondary">Reiniciar</button>
+          <button id="resume-btn" class="btn-cta">Continuar</button>
+          <button id="restart-btn" class="btn-secondary">Reiniciar Partida</button>
         </div>
       </div>
     </div>
@@ -92,7 +131,7 @@
     <div class="overlay hidden" id="gameover-screen">
       <div class="modal-card">
         <h2 id="gameover-title" class="glow-title-secondary">¡VICTORIA!</h2>
-        <p id="gameover-desc" class="subtitle">¡Has derrotado a la máquina!</p>
+        <p id="gameover-desc" class="subtitle">¡Has superado a la inteligencia artificial!</p>
         
         <div class="stats-summary">
           <div class="summary-box">
@@ -109,9 +148,9 @@
       </div>
     </div>
 
-    <!-- Mobile Touch Controls Area (Indicators) -->
-    <div class="touch-zones" id="touch-zones">
-      <div class="touch-hint">Toca o arrastra verticalmente para mover la paleta</div>
+    <!-- Mobile Touch Hint -->
+    <div class="touch-hint" id="touch-hint">
+      Desliza tu dedo verticalmente en la pantalla para moverte
     </div>
   </div>
 

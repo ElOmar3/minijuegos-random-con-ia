@@ -1,7 +1,7 @@
 /**
  * NEON PONG ARCADE — SCRIPT PRINCIPAL
  * 100% Autocontenido, encapsulado como Módulo ES.
- * No expone variables ni funciones al objeto global `window`.
+ * IA con predicción balística y multi-rebote, roles visuales claros y soporte táctil móvil completo.
  */
 
 // ============================================================================
@@ -30,7 +30,7 @@ class SoundController {
     return this.muted;
   }
 
-  playTone(freq, type, duration, startGain = 0.3, endGain = 0.001) {
+  playTone(freq, type, duration, startGain = 0.25, endGain = 0.001) {
     if (this.muted || !this.audioCtx) return;
     try {
       const osc = this.audioCtx.createOscillator();
@@ -48,12 +48,12 @@ class SoundController {
       osc.start();
       osc.stop(this.audioCtx.currentTime + duration);
     } catch (e) {
-      // Audio context might be restricted before interaction
+      // Prevención ante restricciones del navegador
     }
   }
 
   playPaddleHit() {
-    this.playTone(440, 'square', 0.08, 0.25);
+    this.playTone(480, 'square', 0.08, 0.25);
   }
 
   playWallHit() {
@@ -63,7 +63,7 @@ class SoundController {
   playScore() {
     if (this.muted || !this.audioCtx) return;
     this.playTone(520, 'triangle', 0.1, 0.3);
-    setTimeout(() => this.playTone(680, 'triangle', 0.2, 0.3), 100);
+    setTimeout(() => this.playTone(700, 'triangle', 0.2, 0.3), 100);
   }
 
   playGameOver(won) {
@@ -74,7 +74,7 @@ class SoundController {
       setTimeout(() => this.playTone(659.25, 'triangle', 0.25, 0.3), 240);
     } else {
       this.playTone(300, 'sawtooth', 0.15, 0.25);
-      setTimeout(() => this.playTone(220, 'sawtooth', 0.3, 0.25), 150);
+      setTimeout(() => this.playTone(200, 'sawtooth', 0.3, 0.25), 150);
     }
   }
 }
@@ -99,7 +99,6 @@ class ParticleSystem {
         size: Math.random() * 4 + 2,
         color,
         alpha: 1,
-        life: Math.random() * 0.3 + 0.3,
         decay: Math.random() * 0.03 + 0.02
       });
     }
@@ -139,7 +138,7 @@ class ParticleSystem {
 }
 
 // ============================================================================
-// 3. JUEGO PRINCIPAL: NEON PONG
+// 3. JUEGO PRINCIPAL: NEON PONG CON IA INTELIGENTE
 // ============================================================================
 class NeonPongGame {
   constructor() {
@@ -152,7 +151,7 @@ class NeonPongGame {
     this.ctx = this.canvas.getContext('2d');
     this.dpr = window.devicePixelRatio || 1;
 
-    // Dimensiones lógicas de referencia
+    // Dimensiones virtuales del campo
     this.virtualWidth = 1000;
     this.virtualHeight = 600;
 
@@ -160,8 +159,8 @@ class NeonPongGame {
     this.sound = new SoundController();
     this.particles = new ParticleSystem();
 
-    // Estado del juego: 'MENU', 'PLAYING', 'PAUSED', 'GAMEOVER'
-    this.state = 'MENU';
+    // Estado del juego
+    this.state = 'MENU'; // 'MENU', 'PLAYING', 'PAUSED', 'GAMEOVER'
     this.difficulty = 'easy'; // 'easy', 'medium', 'hard'
 
     // Puntuaciones
@@ -171,32 +170,45 @@ class NeonPongGame {
     this.maxRally = 0;
     this.highScore = parseInt(localStorage.getItem(this.STORAGE_KEY) || '0', 10);
 
+    // Indicadores visuales de inicio de ronda
+    this.roundStartTimer = 0;
+    this.roundNoticeAlpha = 1;
+
     // Entidades del juego
     this.paddleWidth = 16;
     this.paddleHeight = 110;
-    this.paddleSpeed = 9;
+    this.paddleSpeed = 9.5;
 
+    // Jugador (Izquierda - Azul)
     this.player = {
+      name: 'TÚ',
+      side: 'left',
       x: 40,
       y: this.virtualHeight / 2 - this.paddleHeight / 2,
+      targetY: this.virtualHeight / 2 - this.paddleHeight / 2,
       width: this.paddleWidth,
       height: this.paddleHeight,
       color: '#06b6d4',
-      glow: '#0891b2',
-      vy: 0
+      glow: '#0891b2'
     };
 
+    // IA Bot (Derecha - Rosa)
     this.ai = {
+      name: 'IA BOT',
+      side: 'right',
       x: this.virtualWidth - 40 - this.paddleWidth,
       y: this.virtualHeight / 2 - this.paddleHeight / 2,
+      targetY: this.virtualHeight / 2 - this.paddleHeight / 2,
       width: this.paddleWidth,
       height: this.paddleHeight,
       color: '#ec4899',
       glow: '#db2777',
-      speed: 6.5,
-      wobble: 0
+      speed: 6.2,
+      predictionError: 0,
+      offensiveOffset: 0
     };
 
+    // Bola
     this.ball = {
       x: this.virtualWidth / 2,
       y: this.virtualHeight / 2,
@@ -210,7 +222,7 @@ class NeonPongGame {
       trail: []
     };
 
-    // Entradas de usuario
+    // Controles de entrada
     this.keys = {
       up: false,
       down: false
@@ -236,7 +248,9 @@ class NeonPongGame {
       resumeBtn: document.getElementById('resume-btn'),
       restartBtn: document.getElementById('restart-btn'),
       playAgainBtn: document.getElementById('play-again-btn'),
-      diffButtons: document.querySelectorAll('.diff-btn')
+      diffButtons: document.querySelectorAll('.diff-btn'),
+      btnTouchUp: document.getElementById('btn-touch-up'),
+      btnTouchDown: document.getElementById('btn-touch-down')
     };
 
     this.init();
@@ -248,7 +262,6 @@ class NeonPongGame {
     this.updateHUD();
     this.resetBall(1);
 
-    // Loop de renderizado
     requestAnimationFrame((t) => this.gameLoop(t));
   }
 
@@ -271,7 +284,7 @@ class NeonPongGame {
   }
 
   setupEventListeners() {
-    // Teclado
+    // 1. Controles de Teclado
     window.addEventListener('keydown', (e) => {
       if (['ArrowUp', 'KeyW'].includes(e.code)) {
         this.keys.up = true;
@@ -292,26 +305,62 @@ class NeonPongGame {
       if (['ArrowDown', 'KeyS'].includes(e.code)) this.keys.down = false;
     });
 
-    // Control táctil y ratón en Canvas
-    const handlePointerMove = (clientY) => {
+    // 2. Control de Ratón
+    this.canvas.addEventListener('mousemove', (e) => {
       if (this.state !== 'PLAYING') return;
       const rect = this.canvas.getBoundingClientRect();
-      const relativeY = (clientY - rect.top) / rect.height;
-      const targetY = relativeY * this.virtualHeight - this.player.height / 2;
-      this.player.y = Math.max(10, Math.min(this.virtualHeight - this.player.height - 10, targetY));
-    };
-
-    this.canvas.addEventListener('mousemove', (e) => {
-      handlePointerMove(e.clientY);
+      const relativeY = (e.clientY - rect.top) / rect.height;
+      this.player.targetY = relativeY * this.virtualHeight - this.player.height / 2;
     });
 
-    this.canvas.addEventListener('touchmove', (e) => {
-      if (e.touches.length > 0) {
-        handlePointerMove(e.touches[0].clientY);
+    // 3. Control Táctil Directo en Pantalla (Arrastrar en cualquier parte)
+    const handleTouchInput = (e) => {
+      if (this.state !== 'PLAYING') return;
+      if (e.touches && e.touches.length > 0) {
+        const touch = e.touches[0];
+        const rect = this.canvas.getBoundingClientRect();
+        const relativeY = (touch.clientY - rect.top) / rect.height;
+        this.player.targetY = relativeY * this.virtualHeight - this.player.height / 2;
       }
-    }, { passive: true });
+    };
 
-    // Botones de UI
+    this.canvas.addEventListener('touchstart', (e) => {
+      this.sound.init();
+      handleTouchInput(e);
+    }, { passive: false });
+
+    this.canvas.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      handleTouchInput(e);
+    }, { passive: false });
+
+    // 4. Botones Táctiles Virtuales en Pantalla (Mobile Controls)
+    if (this.dom.btnTouchUp && this.dom.btnTouchDown) {
+      const bindTouchBtn = (btn, isUp) => {
+        const start = (e) => {
+          e.preventDefault();
+          this.sound.init();
+          if (isUp) this.keys.up = true;
+          else this.keys.down = true;
+        };
+        const end = (e) => {
+          e.preventDefault();
+          if (isUp) this.keys.up = false;
+          else this.keys.down = false;
+        };
+
+        btn.addEventListener('touchstart', start, { passive: false });
+        btn.addEventListener('touchend', end, { passive: false });
+        btn.addEventListener('mousedown', start);
+        btn.addEventListener('mouseup', end);
+        btn.addEventListener('mouseleave', end);
+      };
+
+      bindTouchBtn(this.dom.btnTouchUp, true);
+      bindTouchBtn(this.dom.btnTouchDown, false);
+    }
+
+    // 5. Botones de la Interfaz
     this.dom.startBtn.addEventListener('click', () => {
       this.sound.init();
       this.startGame();
@@ -332,7 +381,7 @@ class NeonPongGame {
       this.dom.soundIcon.textContent = isMuted ? '🔇' : '🔊';
     });
 
-    // Selector de dificultad
+    // 6. Selector de Dificultad
     this.dom.diffButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         this.dom.diffButtons.forEach(b => b.classList.remove('active'));
@@ -346,15 +395,18 @@ class NeonPongGame {
   applyDifficultySettings() {
     switch (this.difficulty) {
       case 'easy':
-        this.ai.speed = 5.2;
+        this.ai.speed = 5.8;
+        this.ai.predictionError = 30;
         this.ball.baseSpeed = 6.5;
         break;
       case 'medium':
-        this.ai.speed = 6.8;
+        this.ai.speed = 7.8;
+        this.ai.predictionError = 12;
         this.ball.baseSpeed = 7.5;
         break;
       case 'hard':
-        this.ai.speed = 8.5;
+        this.ai.speed = 10.2;
+        this.ai.predictionError = 0;
         this.ball.baseSpeed = 8.5;
         break;
     }
@@ -396,7 +448,6 @@ class NeonPongGame {
     this.state = 'GAMEOVER';
     this.sound.playGameOver(won);
 
-    // Guardar récord si el rally superó el máximo
     if (this.maxRally > this.highScore) {
       this.highScore = this.maxRally;
       localStorage.setItem(this.STORAGE_KEY, this.highScore.toString());
@@ -406,8 +457,8 @@ class NeonPongGame {
     this.dom.gameoverTitleEl.textContent = won ? '¡VICTORIA!' : '¡DERROTA!';
     this.dom.gameoverTitleEl.style.color = won ? 'var(--color-cyan)' : 'var(--color-pink)';
     this.dom.gameoverDescEl.textContent = won
-      ? '¡Has vencido al algoritmo con reflejos impecables!'
-      : 'La IA te ha superado esta vez. ¡Inténtalo de nuevo!';
+      ? '¡Has vencido a la inteligencia artificial con gran destreza!'
+      : 'La IA táctica te ha superado esta vez. ¡Inténtalo de nuevo!';
 
     this.dom.summaryMaxRallyEl.textContent = this.maxRally;
     this.dom.summaryFinalScoreEl.textContent = `${this.playerScore} - ${this.aiScore}`;
@@ -423,6 +474,7 @@ class NeonPongGame {
     this.ball.vy = (Math.random() * 4 - 2);
     this.ball.trail = [];
     this.rally = 0;
+    this.roundStartTimer = 150; // Temporizador para mostrar carteles "TÚ" e "IA"
     this.updateHUD();
   }
 
@@ -433,35 +485,91 @@ class NeonPongGame {
     this.dom.highScoreEl.textContent = this.highScore;
   }
 
+  // ==========================================================================
+  // PREDICCIÓN BALÍSTICA TÁCTICA DE LA IA
+  // ==========================================================================
+  predictBallInterceptY() {
+    // Si la bola va hacia el jugador (izquierda), la IA vuelve al centro
+    if (this.ball.vx <= 0) {
+      return this.virtualHeight / 2;
+    }
+
+    // Simulación de trayectoria balística con rebotes en paredes
+    let simX = this.ball.x;
+    let simY = this.ball.y;
+    let simVx = this.ball.vx;
+    let simVy = this.ball.vy;
+
+    const topLimit = 10 + this.ball.radius;
+    const bottomLimit = this.virtualHeight - 10 - this.ball.radius;
+    const targetX = this.ai.x;
+
+    let maxSteps = 250;
+    while (simX < targetX && maxSteps > 0) {
+      simX += simVx;
+      simY += simVy;
+
+      if (simY <= topLimit) {
+        simY = topLimit;
+        simVy = -simVy;
+      } else if (simY >= bottomLimit) {
+        simY = bottomLimit;
+        simVy = -simVy;
+      }
+      maxSteps--;
+    }
+
+    // Añadir comportamiento táctico según dificultad
+    if (this.difficulty === 'hard') {
+      // En difícil, la IA intenta cortar ángulos golpeando con las esquinas de su paleta
+      const offensiveCorner = (this.player.y > this.virtualHeight / 2) ? -35 : 35;
+      return simY + offensiveCorner;
+    } else if (this.difficulty === 'medium') {
+      // Error mínimo
+      const noise = (Math.sin(Date.now() * 0.003) * this.ai.predictionError);
+      return simY + noise;
+    } else {
+      // Fácil: margen de error más amplio y oscilación
+      const noise = (Math.sin(Date.now() * 0.002) * this.ai.predictionError);
+      return simY + noise;
+    }
+  }
+
   update() {
     if (this.state !== 'PLAYING') return;
 
-    // 1. Movimiento del Jugador por Teclado
+    if (this.roundStartTimer > 0) {
+      this.roundStartTimer--;
+      this.roundNoticeAlpha = Math.min(1, this.roundStartTimer / 40);
+    }
+
+    // 1. Movimiento del Jugador (Teclado o Touch/Mouse)
     if (this.keys.up) {
       this.player.y -= this.paddleSpeed;
-    }
-    if (this.keys.down) {
+      this.player.targetY = this.player.y;
+    } else if (this.keys.down) {
       this.player.y += this.paddleSpeed;
+      this.player.targetY = this.player.y;
+    } else if (this.player.targetY !== undefined) {
+      // Suavizado cuando se usa ratón o toque
+      const diff = this.player.targetY - this.player.y;
+      this.player.y += diff * 0.35;
     }
     this.player.y = Math.max(10, Math.min(this.virtualHeight - this.player.height - 10, this.player.y));
 
-    // 2. IA Bot
-    const aiCenter = this.ai.y + this.ai.height / 2;
-    // Predicción de movimiento con retardo según dificultad
-    let targetY = this.ball.y;
-    if (this.difficulty === 'easy') {
-      targetY += (Math.sin(Date.now() * 0.005) * 35);
-    }
+    // 2. IA Táctica
+    const predictedY = this.predictBallInterceptY();
+    const aiTargetCenter = predictedY - this.ai.height / 2;
+    const aiDiff = aiTargetCenter - this.ai.y;
 
-    if (aiCenter < targetY - 15) {
-      this.ai.y += this.ai.speed;
-    } else if (aiCenter > targetY + 15) {
-      this.ai.y -= this.ai.speed;
+    if (Math.abs(aiDiff) > 5) {
+      const step = Math.sign(aiDiff) * Math.min(Math.abs(aiDiff), this.ai.speed);
+      this.ai.y += step;
     }
     this.ai.y = Math.max(10, Math.min(this.virtualHeight - this.ai.height - 10, this.ai.y));
 
     // 3. Estela de la Bola
-    this.ball.trail.push({ x: this.ball.x, y: this.ball.y, speed: this.ball.currentSpeed });
+    this.ball.trail.push({ x: this.ball.x, y: this.ball.y });
     if (this.ball.trail.length > 8) {
       this.ball.trail.shift();
     }
@@ -470,7 +578,7 @@ class NeonPongGame {
     this.ball.x += this.ball.vx;
     this.ball.y += this.ball.vy;
 
-    // Colisión con Techo y Suelo
+    // Colisiones con Techo y Suelo
     if (this.ball.y - this.ball.radius <= 10) {
       this.ball.y = 10 + this.ball.radius;
       this.ball.vy *= -1;
@@ -505,23 +613,21 @@ class NeonPongGame {
       this.handlePaddleHit(this.ai, -1);
     }
 
-    // 7. Puntos / Goles
-    // Punto para la IA
+    // 7. Goles y Puntos
     if (this.ball.x < 0) {
+      // Gol de la IA
       this.aiScore++;
       this.sound.playScore();
       this.particles.emit(10, this.ball.y, '#ec4899', 24, 7);
       this.checkScoreGoal(-1);
-    }
-    // Punto para el Jugador
-    else if (this.ball.x > this.virtualWidth) {
+    } else if (this.ball.x > this.virtualWidth) {
+      // Gol del Jugador
       this.playerScore++;
       this.sound.playScore();
       this.particles.emit(this.virtualWidth - 10, this.ball.y, '#06b6d4', 24, 7);
       this.checkScoreGoal(1);
     }
 
-    // Actualizar partículas
     this.particles.update();
   }
 
@@ -533,20 +639,20 @@ class NeonPongGame {
     this.updateHUD();
     this.sound.playPaddleHit();
 
-    // Aceleración suave con cada rebote
-    this.ball.currentSpeed = Math.min(18, this.ball.currentSpeed + 0.4);
+    // Aceleración de la bola
+    this.ball.currentSpeed = Math.min(18.5, this.ball.currentSpeed + 0.45);
 
-    // Calcular ángulo de rebote según el impacto en la paleta (-1 arriba, 0 centro, 1 abajo)
+    // Ángulo de rebote según punto de impacto (-1 arriba, 0 centro, 1 abajo)
     const hitOffset = (this.ball.y - (paddle.y + paddle.height / 2)) / (paddle.height / 2);
-    const maxAngle = Math.PI / 3; // 60 grados max
+    const maxAngle = Math.PI / 3; // 60 grados
     const bounceAngle = hitOffset * maxAngle;
 
     this.ball.vx = dirX * this.ball.currentSpeed * Math.cos(bounceAngle);
     this.ball.vy = this.ball.currentSpeed * Math.sin(bounceAngle);
 
-    // Partículas de impacto
+    // Partículas de choque
     const hitX = dirX === 1 ? paddle.x + paddle.width : paddle.x;
-    this.particles.emit(hitX, this.ball.y, paddle.color, 12, 5);
+    this.particles.emit(hitX, this.ball.y, paddle.color, 14, 5);
   }
 
   checkScoreGoal(scoredDir) {
@@ -572,10 +678,10 @@ class NeonPongGame {
     this.ctx.fillStyle = bgGrad;
     this.ctx.fillRect(0, 0, this.virtualWidth, this.virtualHeight);
 
-    // Rejilla de fondo retro sutil
+    // Rejilla sutil
     this.drawBackgroundGrid();
 
-    // Línea central punteada
+    // Línea central divisoria
     this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
     this.ctx.lineWidth = 4;
     this.ctx.setLineDash([12, 12]);
@@ -594,6 +700,11 @@ class NeonPongGame {
 
     // Dibujar Partículas
     this.particles.draw(this.ctx);
+
+    // Indicadores flotantes de rol ("⬅️ TÚ" e "IA ➡️")
+    if (this.roundStartTimer > 0) {
+      this.drawRolePointers();
+    }
 
     this.ctx.restore();
   }
@@ -622,15 +733,14 @@ class NeonPongGame {
     this.ctx.save();
     this.ctx.fillStyle = paddle.color;
     this.ctx.shadowColor = paddle.color;
-    this.ctx.shadowBlur = 15;
+    this.ctx.shadowBlur = 16;
 
-    // Rectángulo redondeado
     const r = 8;
     this.ctx.beginPath();
     this.ctx.roundRect(paddle.x, paddle.y, paddle.width, paddle.height, r);
     this.ctx.fill();
 
-    // Núcleo blanco brillante
+    // Núcleo interior brillante
     this.ctx.fillStyle = '#ffffff';
     this.ctx.beginPath();
     this.ctx.roundRect(paddle.x + 4, paddle.y + 4, paddle.width - 8, paddle.height - 8, r / 2);
@@ -642,7 +752,6 @@ class NeonPongGame {
   drawBall() {
     this.ctx.save();
 
-    // Dibujar estela
     for (let i = 0; i < this.ball.trail.length; i++) {
       const pos = this.ball.trail[i];
       const progress = (i + 1) / this.ball.trail.length;
@@ -652,7 +761,6 @@ class NeonPongGame {
       this.ctx.fill();
     }
 
-    // Bola principal con resplandor neón
     this.ctx.fillStyle = this.ball.color;
     this.ctx.shadowColor = '#06b6d4';
     this.ctx.shadowBlur = 18;
@@ -660,6 +768,29 @@ class NeonPongGame {
     this.ctx.beginPath();
     this.ctx.arc(this.ball.x, this.ball.y, this.ball.radius, 0, Math.PI * 2);
     this.ctx.fill();
+
+    this.ctx.restore();
+  }
+
+  drawRolePointers() {
+    this.ctx.save();
+    this.ctx.globalAlpha = this.roundNoticeAlpha;
+    this.ctx.font = 'bold 16px -apple-system, sans-serif';
+    this.ctx.textAlign = 'left';
+    this.ctx.textBaseline = 'middle';
+
+    // Etiqueta Jugador (Azul)
+    this.ctx.fillStyle = '#06b6d4';
+    this.ctx.shadowColor = '#06b6d4';
+    this.ctx.shadowBlur = 10;
+    this.ctx.fillText('⬅️ TÚ (AZUL)', this.player.x + this.player.width + 15, this.player.y + this.player.height / 2);
+
+    // Etiqueta IA (Rosa)
+    this.ctx.textAlign = 'right';
+    this.ctx.fillStyle = '#ec4899';
+    this.ctx.shadowColor = '#ec4899';
+    this.ctx.shadowBlur = 10;
+    this.ctx.fillText('(ROSA) IA BOT ➡️', this.ai.x - 15, this.ai.y + this.ai.height / 2);
 
     this.ctx.restore();
   }
