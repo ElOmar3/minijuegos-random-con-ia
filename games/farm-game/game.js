@@ -1,5 +1,5 @@
 /* ==========================================================================
-   GRANJA MÁGICA 3D — FULL ENGINE (Three.js Low-Poly)
+   GRANJA MÁGICA 3D — FULL ENGINE (Three.js Low-Poly Deluxe Edition)
    ========================================================================== */
 
 (function () {
@@ -215,7 +215,7 @@
     t._timer = setTimeout(() => { t.style.display = 'none'; }, 2500);
   }
 
-  // --- THREE.JS 3D SCENE ---
+  // --- THREE.JS 3D SCENE & DETAILED MODELING ---
   let scene, camera, renderer, dirLight, hemiLight;
   let windmillBlades;
   let player, legL, legR, armR, body, toolWaterCan;
@@ -255,11 +255,11 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // Lights
-    hemiLight = new THREE.HemisphereLight(0xffffff, 0x446622, 0.7);
+    // Warm Ambient & Sun Lights
+    hemiLight = new THREE.HemisphereLight(0xffffff, 0x446622, 0.75);
     scene.add(hemiLight);
 
-    dirLight = new THREE.DirectionalLight(0xfffaed, 0.85);
+    dirLight = new THREE.DirectionalLight(0xfffaed, 0.9);
     dirLight.position.set(20, 35, 20);
     dirLight.castShadow = true;
     dirLight.shadow.mapSize.width = 1024;
@@ -278,7 +278,7 @@
   }
 
   function buildEnvironment() {
-    // Ground
+    // Ground Island
     const groundGeo = new THREE.PlaneGeometry(85, 85, 16, 16);
     const groundMat = new THREE.MeshLambertMaterial({ color: 0x5dae3c });
     const ground = new THREE.Mesh(groundGeo, groundMat);
@@ -286,38 +286,66 @@
     ground.receiveShadow = true;
     scene.add(ground);
 
-    // Stone Path
+    // Cobblestone Path with flagstones
     const pathMat = new THREE.MeshLambertMaterial({ color: 0x9e9e9e });
-    const path = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 24), pathMat);
+    const path = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 24), pathMat);
     path.rotation.x = -Math.PI / 2;
     path.position.set(0, 0.01, 0);
     scene.add(path);
 
-    // Trees
-    [[-18, -14], [-14, -18], [16, -14], [18, 12], [-18, 16], [14, 16], [-12, -8], [12, -8], [20, 0], [-20, 0], [0, -18]].forEach(p => {
+    // Trees (Apple & Pine)
+    const treePos = [[-18, -14], [-14, -18], [16, -14], [18, 12], [-18, 16], [14, 16], [-12, -8], [12, -8], [20, 0], [-20, 0], [0, -18]];
+    treePos.forEach((p, idx) => {
       const tree = new THREE.Group();
       const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.35, 1.4, 6), new THREE.MeshLambertMaterial({ color: 0x6d4c41 }));
       trunk.position.y = 0.7;
       trunk.castShadow = true;
       tree.add(trunk);
-      const leaves = new THREE.Mesh(new THREE.DodecahedronGeometry(1.2, 1), new THREE.MeshLambertMaterial({ color: 0x388e3c }));
-      leaves.position.y = 2.0;
-      leaves.castShadow = true;
-      tree.add(leaves);
+
+      // Varied foliage (some pine, some rounded apple trees)
+      if (idx % 2 === 0) {
+        const leaves = new THREE.Mesh(new THREE.DodecahedronGeometry(1.3, 1), new THREE.MeshLambertMaterial({ color: 0x388e3c }));
+        leaves.position.y = 2.0;
+        leaves.castShadow = true;
+        tree.add(leaves);
+        // Red apples
+        for (let i = 0; i < 4; i++) {
+          const apple = new THREE.Mesh(new THREE.SphereGeometry(0.12, 5, 5), new THREE.MeshLambertMaterial({ color: 0xe53935 }));
+          const ang = (i / 4) * Math.PI * 2;
+          apple.position.set(Math.cos(ang) * 0.9, 1.8 + (i % 2) * 0.3, Math.sin(ang) * 0.9);
+          tree.add(apple);
+        }
+      } else {
+        const cone1 = new THREE.Mesh(new THREE.ConeGeometry(1.2, 1.4, 6), new THREE.MeshLambertMaterial({ color: 0x2e7d32 }));
+        cone1.position.y = 1.6;
+        cone1.castShadow = true;
+        tree.add(cone1);
+        const cone2 = new THREE.Mesh(new THREE.ConeGeometry(0.9, 1.2, 6), new THREE.MeshLambertMaterial({ color: 0x388e3c }));
+        cone2.position.y = 2.3;
+        cone2.castShadow = true;
+        tree.add(cone2);
+      }
       tree.position.set(p[0], 0, p[1]);
       scene.add(tree);
     });
 
-    // Barn
+    // Detailed Red Barn
     const barn = new THREE.Group();
     const barnMesh = new THREE.Mesh(new THREE.BoxGeometry(5.5, 3.8, 4.5), new THREE.MeshLambertMaterial({ color: 0xc62828 }));
     barnMesh.position.y = 1.9;
     barnMesh.castShadow = true;
     barn.add(barnMesh);
+
     const roof = new THREE.Mesh(new THREE.ConeGeometry(4.2, 2.2, 4), new THREE.MeshLambertMaterial({ color: 0x37474f }));
     roof.position.y = 4.8;
     roof.rotation.y = Math.PI / 4;
     barn.add(roof);
+
+    // Barn Door & White X trim
+    const door = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 2.4), new THREE.MeshLambertMaterial({ color: 0xffffff }));
+    door.position.set(0, 1.2, 2.26);
+    barn.add(door);
+
     barn.position.set(-13, 0, -11);
     scene.add(barn);
 
@@ -345,13 +373,19 @@
     windmill.position.set(13, 0, -11);
     scene.add(windmill);
 
-    // Pond
+    // Pond with water lilies
     const pond = new THREE.Mesh(new THREE.CircleGeometry(3.6, 16), new THREE.MeshLambertMaterial({ color: 0x29b6f6 }));
     pond.rotation.x = -Math.PI / 2;
     pond.position.set(13, 0.02, 9);
     scene.add(pond);
 
-    // Fence
+    // Lily pad
+    const lily = new THREE.Mesh(new THREE.CircleGeometry(0.4, 8), new THREE.MeshLambertMaterial({ color: 0x43a047 }));
+    lily.rotation.x = -Math.PI / 2;
+    lily.position.set(12.2, 0.03, 8.5);
+    scene.add(lily);
+
+    // Animal Pasture Fence
     const fenceMat = new THREE.MeshLambertMaterial({ color: 0x8d6e63 });
     const fenceTop = new THREE.Mesh(new THREE.BoxGeometry(8, 0.5, 0.15), fenceMat);
     fenceTop.position.set(-11, 0.25, 3);
@@ -364,41 +398,80 @@
   function buildPlayer() {
     player = new THREE.Group();
 
+    // Body with Denim Overalls
     body = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.45, 0.9, 8), new THREE.MeshLambertMaterial({ color: 0x1976D2 }));
     body.position.y = 0.85;
     body.castShadow = true;
     player.add(body);
 
+    // Red Neck Bandana
+    const bandana = new THREE.Mesh(new THREE.ConeGeometry(0.38, 0.2, 6), new THREE.MeshLambertMaterial({ color: 0xe53935 }));
+    bandana.position.set(0, 1.25, 0.08);
+    bandana.rotation.x = Math.PI;
+    player.add(bandana);
+
+    // Head
     const head = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 8), new THREE.MeshLambertMaterial({ color: 0xffcc80 }));
     head.position.y = 1.5;
     player.add(head);
 
-    const hatBrim = new THREE.Mesh(new THREE.CylinderGeometry(0.65, 0.65, 0.05, 8), new THREE.MeshLambertMaterial({ color: 0xfbc02d }));
+    // Eyes
+    const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.04, 4, 4), new THREE.MeshLambertMaterial({ color: 0x212121 }));
+    eyeL.position.set(-0.1, 1.54, 0.27);
+    player.add(eyeL);
+    const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.04, 4, 4), new THREE.MeshLambertMaterial({ color: 0x212121 }));
+    eyeR.position.set(0.1, 1.54, 0.27);
+    player.add(eyeR);
+
+    // Straw Hat with Red Ribbon
+    const hatBrim = new THREE.Mesh(new THREE.CylinderGeometry(0.68, 0.68, 0.05, 10), new THREE.MeshLambertMaterial({ color: 0xfbc02d }));
     hatBrim.position.y = 1.68;
     player.add(hatBrim);
 
-    const hatTop = new THREE.Mesh(new THREE.ConeGeometry(0.35, 0.4, 8), new THREE.MeshLambertMaterial({ color: 0xfbc02d }));
-    hatTop.position.y = 1.9;
+    const hatRibbon = new THREE.Mesh(new THREE.CylinderGeometry(0.37, 0.37, 0.08, 10), new THREE.MeshLambertMaterial({ color: 0xd32f2f }));
+    hatRibbon.position.y = 1.74;
+    player.add(hatRibbon);
+
+    const hatTop = new THREE.Mesh(new THREE.ConeGeometry(0.36, 0.38, 8), new THREE.MeshLambertMaterial({ color: 0xfbc02d }));
+    hatTop.position.y = 1.92;
     player.add(hatTop);
 
-    legL = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.5, 6), new THREE.MeshLambertMaterial({ color: 0x0d47a1 }));
-    legL.position.set(-0.2, 0.25, 0);
+    // Legs with Brown Boots
+    legL = new THREE.Group();
+    const pantsL = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.35, 6), new THREE.MeshLambertMaterial({ color: 0x0d47a1 }));
+    pantsL.position.y = 0.32;
+    legL.add(pantsL);
+    const bootL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.18, 0.26), new THREE.MeshLambertMaterial({ color: 0x5d4037 }));
+    bootL.position.set(0, 0.09, 0.04);
+    legL.add(bootL);
+    legL.position.set(-0.2, 0, 0);
     player.add(legL);
 
-    legR = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.5, 6), new THREE.MeshLambertMaterial({ color: 0x0d47a1 }));
-    legR.position.set(0.2, 0.25, 0);
+    legR = new THREE.Group();
+    const pantsR = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.35, 6), new THREE.MeshLambertMaterial({ color: 0x0d47a1 }));
+    pantsR.position.y = 0.32;
+    legR.add(pantsR);
+    const bootR = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.18, 0.26), new THREE.MeshLambertMaterial({ color: 0x5d4037 }));
+    bootR.position.set(0, 0.09, 0.04);
+    legR.add(bootR);
+    legR.position.set(0.2, 0, 0);
     player.add(legR);
 
+    // Arm with Watering Can Tool
     armR = new THREE.Group();
-    const armMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.5, 6), new THREE.MeshLambertMaterial({ color: 0x1976D2 }));
+    const armMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.5, 6), new THREE.MeshLambertMaterial({ color: 0x1976D2 }));
     armMesh.position.y = -0.25;
     armR.add(armMesh);
     armR.position.set(0.42, 1.2, 0);
 
     toolWaterCan = new THREE.Group();
-    const canBody = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.15, 0.3, 6), new THREE.MeshLambertMaterial({ color: 0x4fc3f7 }));
-    canBody.position.set(0, -0.4, 0.15);
+    const canBody = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.15, 0.28, 6), new THREE.MeshLambertMaterial({ color: 0x4fc3f7 }));
+    canBody.position.set(0, -0.38, 0.16);
     toolWaterCan.add(canBody);
+    const spout = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.05, 0.25, 4), new THREE.MeshLambertMaterial({ color: 0x81d4fa }));
+    spout.position.set(0, -0.32, 0.32);
+    spout.rotation.x = Math.PI / 4;
+    toolWaterCan.add(spout);
     armR.add(toolWaterCan);
     player.add(armR);
 
@@ -426,7 +499,7 @@
 
     window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
 
-    // Touch Virtual Joystick
+    // Touch Joystick for Mobile
     const joyZone = document.getElementById('joystick-zone');
     const joyKnob = document.getElementById('joystick-knob');
     let touchId = null;
@@ -480,6 +553,7 @@
         const px = (c - (PLOT_COLS - 1) / 2) * (PLOT_SIZE + 0.5);
         const pz = (r - (PLOT_ROWS - 1) / 2) * (PLOT_SIZE + 0.5);
 
+        // Plot with beveled soil box
         const soil = new THREE.Mesh(new THREE.BoxGeometry(PLOT_SIZE, 0.25, PLOT_SIZE), new THREE.MeshLambertMaterial({ color: 0x8d5b2d }));
         soil.position.set(px, 0.12, pz);
         soil.receiveShadow = true;
@@ -507,96 +581,592 @@
     scene.add(plotsGroup);
   }
 
+  // --- DETAILED PROCEDURAL 3D CROPS BUILDERS ---
+
+  function createSproutMesh() {
+    const group = new THREE.Group();
+    // Dirt mound
+    const mound = new THREE.Mesh(new THREE.ConeGeometry(0.35, 0.15, 6), new THREE.MeshLambertMaterial({ color: 0x5c3818 }));
+    mound.position.y = 0.07;
+    group.add(mound);
+    // Stem
+    const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.04, 0.3, 5), new THREE.MeshLambertMaterial({ color: 0x76ff03 }));
+    stem.position.y = 0.2;
+    group.add(stem);
+    // 2 Heart Cotyledons / Leaves
+    const leafMat = new THREE.MeshLambertMaterial({ color: 0x64dd17 });
+    const leaf1 = new THREE.Mesh(new THREE.SphereGeometry(0.1, 4, 4), leafMat);
+    leaf1.scale.set(1.4, 0.2, 0.8);
+    leaf1.position.set(0.1, 0.32, 0);
+    leaf1.rotation.z = -Math.PI / 6;
+    group.add(leaf1);
+    const leaf2 = new THREE.Mesh(new THREE.SphereGeometry(0.1, 4, 4), leafMat);
+    leaf2.scale.set(1.4, 0.2, 0.8);
+    leaf2.position.set(-0.1, 0.32, 0);
+    leaf2.rotation.z = Math.PI / 6;
+    group.add(leaf2);
+    return group;
+  }
+
+  function createGrowingBushMesh(color) {
+    const group = new THREE.Group();
+    const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, 0.7, 6), new THREE.MeshLambertMaterial({ color: 0x4caf50 }));
+    stem.position.y = 0.35;
+    group.add(stem);
+    // 4 spreading leaves
+    const leafMat = new THREE.MeshLambertMaterial({ color: 0x43a047 });
+    for (let i = 0; i < 4; i++) {
+      const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.16, 5, 5), leafMat);
+      leaf.scale.set(1.6, 0.3, 0.9);
+      const ang = (i / 4) * Math.PI * 2;
+      leaf.position.set(Math.cos(ang) * 0.22, 0.3 + (i * 0.08), Math.sin(ang) * 0.22);
+      leaf.rotation.y = ang;
+      leaf.rotation.z = -0.3;
+      group.add(leaf);
+    }
+    return group;
+  }
+
+  function createWheatMesh(isGolden) {
+    const group = new THREE.Group();
+    const stalkMat = new THREE.MeshLambertMaterial({ color: isGolden ? 0xffd700 : 0xe6b800 });
+    const grainMat = new THREE.MeshLambertMaterial({ color: isGolden ? 0xffeb3b : 0xfbc02d });
+
+    // 7 Wheat stalks clustered together
+    for (let i = 0; i < 7; i++) {
+      const stalkGroup = new THREE.Group();
+      const ang = (i / 7) * Math.PI * 2;
+      const r = i === 0 ? 0 : 0.22;
+
+      // Curving Stem
+      const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.03, 1.1, 4), stalkMat);
+      stem.position.y = 0.55;
+      stalkGroup.add(stem);
+
+      // Segmented Golden Grain Ear
+      for (let k = 0; k < 5; k++) {
+        const kernel = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.12, 5), grainMat);
+        kernel.position.y = 0.85 + (k * 0.08);
+        kernel.rotation.z = (k % 2 === 0 ? 0.2 : -0.2);
+        stalkGroup.add(kernel);
+      }
+
+      // Tip Beard / Awn
+      const awn = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.2, 3), grainMat);
+      awn.position.y = 1.32;
+      stalkGroup.add(awn);
+
+      stalkGroup.position.set(Math.cos(ang) * r, 0, Math.sin(ang) * r);
+      stalkGroup.rotation.z = (Math.cos(ang) * 0.15);
+      stalkGroup.rotation.x = (Math.sin(ang) * 0.15);
+      group.add(stalkGroup);
+    }
+    return group;
+  }
+
+  function createCarrotMesh(isGolden) {
+    const group = new THREE.Group();
+    // Dark Earth Mound
+    const mound = new THREE.Mesh(new THREE.ConeGeometry(0.7, 0.22, 8), new THREE.MeshLambertMaterial({ color: 0x4a2e16 }));
+    mound.position.y = 0.1;
+    group.add(mound);
+
+    const carrotMat = new THREE.MeshLambertMaterial({ color: isGolden ? 0xffd700 : 0xff7043 });
+    const leafMat = new THREE.MeshLambertMaterial({ color: 0x43a047 });
+
+    // 3 Carrots in the plot
+    const pos = [[0, 0], [-0.22, 0.18], [0.22, -0.15]];
+    pos.forEach(([cx, cz], idx) => {
+      const cGroup = new THREE.Group();
+      // Carrot body poking out
+      const carrot = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.65, 7), carrotMat);
+      carrot.rotation.x = Math.PI;
+      carrot.position.y = 0.25;
+      cGroup.add(carrot);
+
+      // Feathered Leafy Crown (Carrot tops)
+      for (let l = 0; l < 4; l++) {
+        const frond = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.5, 4), leafMat);
+        const lAng = (l / 4) * Math.PI * 2;
+        frond.position.set(Math.cos(lAng) * 0.08, 0.65, Math.sin(lAng) * 0.08);
+        frond.rotation.z = Math.cos(lAng) * 0.35;
+        frond.rotation.x = Math.sin(lAng) * 0.35;
+        cGroup.add(frond);
+      }
+
+      cGroup.position.set(cx, 0, cz);
+      cGroup.rotation.y = idx * 1.2;
+      group.add(cGroup);
+    });
+    return group;
+  }
+
+  function createTomatoMesh(isGolden) {
+    const group = new THREE.Group();
+    // Wooden Garden Stake
+    const stake = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.6, 5), new THREE.MeshLambertMaterial({ color: 0x795548 }));
+    stake.position.y = 0.8;
+    group.add(stake);
+
+    // Climbing Vine
+    const vineMat = new THREE.MeshLambertMaterial({ color: 0x2e7d32 });
+    const leafMat = new THREE.MeshLambertMaterial({ color: 0x43a047 });
+    const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 1.4, 6), vineMat);
+    stem.position.set(0.05, 0.7, 0);
+    group.add(stem);
+
+    // Leaves
+    for (let i = 0; i < 6; i++) {
+      const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.18, 5, 4), leafMat);
+      leaf.scale.set(1.5, 0.3, 0.8);
+      const ang = (i / 6) * Math.PI * 2;
+      leaf.position.set(Math.cos(ang) * 0.28, 0.35 + (i * 0.18), Math.sin(ang) * 0.28);
+      leaf.rotation.y = ang;
+      group.add(leaf);
+    }
+
+    // 4 Glossy Red Tomatoes with 5-pointed Sepals
+    const tomMat = new THREE.MeshLambertMaterial({ color: isGolden ? 0xffd700 : 0xe53935 });
+    const sepalMat = new THREE.MeshLambertMaterial({ color: 0x1b5e20 });
+    const tomPos = [[-0.2, 0.45, 0.2], [0.25, 0.65, -0.15], [-0.15, 0.95, -0.2], [0.2, 1.1, 0.15]];
+
+    tomPos.forEach(([tx, ty, tz]) => {
+      const tomGroup = new THREE.Group();
+      // Round Tomato
+      const fruit = new THREE.Mesh(new THREE.SphereGeometry(0.2, 8, 8), tomMat);
+      fruit.scale.set(1.1, 0.95, 1.1);
+      tomGroup.add(fruit);
+      // Star Calyx/Sepal on top
+      const sepal = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.05, 5), sepalMat);
+      sepal.position.y = 0.18;
+      tomGroup.add(sepal);
+
+      tomGroup.position.set(tx, ty, tz);
+      group.add(tomGroup);
+    });
+
+    return group;
+  }
+
+  function createPumpkinMesh(isGolden) {
+    const group = new THREE.Group();
+    // Sprawling Vine Leaves on ground
+    const vineMat = new THREE.MeshLambertMaterial({ color: 0x388e3c });
+    for (let i = 0; i < 4; i++) {
+      const vLeaf = new THREE.Mesh(new THREE.SphereGeometry(0.35, 6, 4), vineMat);
+      vLeaf.scale.set(1.4, 0.15, 1.2);
+      const ang = (i / 4) * Math.PI * 2;
+      vLeaf.position.set(Math.cos(ang) * 0.7, 0.05, Math.sin(ang) * 0.7);
+      group.add(vLeaf);
+    }
+
+    const pumpMat = new THREE.MeshLambertMaterial({ color: isGolden ? 0xffd700 : 0xf57c00 });
+
+    // Segmented Ribbed Pumpkin (6 radial overlapping spheres)
+    const pumpGroup = new THREE.Group();
+    for (let i = 0; i < 6; i++) {
+      const rib = new THREE.Mesh(new THREE.SphereGeometry(0.48, 7, 7), pumpMat);
+      rib.scale.set(1.35, 1.0, 0.6);
+      rib.rotation.y = (i / 6) * Math.PI;
+      pumpGroup.add(rib);
+    }
+
+    // Twisted Woody Green Stem
+    const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.1, 0.35, 5), new THREE.MeshLambertMaterial({ color: 0x33691e }));
+    stem.position.y = 0.55;
+    stem.rotation.z = 0.25;
+    pumpGroup.add(stem);
+
+    pumpGroup.position.y = 0.42;
+    group.add(pumpGroup);
+    return group;
+  }
+
+  function createStrawberryMesh(isGolden) {
+    const group = new THREE.Group();
+    // Bushy mound of leaves
+    const bushMat = new THREE.MeshLambertMaterial({ color: 0x2e7d32 });
+    const leafMat = new THREE.MeshLambertMaterial({ color: 0x43a047 });
+    const mound = new THREE.Mesh(new THREE.SphereGeometry(0.5, 7, 6), bushMat);
+    mound.scale.set(1.4, 0.6, 1.4);
+    mound.position.y = 0.25;
+    group.add(mound);
+
+    // Detailed Trifoliate Leaves
+    for (let i = 0; i < 6; i++) {
+      const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.2, 5, 4), leafMat);
+      leaf.scale.set(1.3, 0.2, 0.9);
+      const ang = (i / 6) * Math.PI * 2;
+      leaf.position.set(Math.cos(ang) * 0.55, 0.28, Math.sin(ang) * 0.55);
+      leaf.rotation.y = ang;
+      group.add(leaf);
+    }
+
+    // Heart-shaped Red Strawberries
+    const strawMat = new THREE.MeshLambertMaterial({ color: isGolden ? 0xffd700 : 0xe91e63 });
+    const capMat = new THREE.MeshLambertMaterial({ color: 0x1b5e20 });
+    const sPos = [[0.4, 0.25, 0.2], [-0.35, 0.22, 0.3], [0.1, 0.28, -0.42], [-0.38, 0.26, -0.22]];
+
+    sPos.forEach(([sx, sy, sz]) => {
+      const sGroup = new THREE.Group();
+      // Strawberry Cone/Heart
+      const berry = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.3, 7), strawMat);
+      berry.rotation.x = Math.PI;
+      sGroup.add(berry);
+      // Green Cap
+      const cap = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.05, 5), capMat);
+      cap.position.y = 0.16;
+      sGroup.add(cap);
+
+      sGroup.position.set(sx, sy, sz);
+      sGroup.rotation.z = 0.2;
+      group.add(sGroup);
+    });
+
+    // White Flowers with Yellow center
+    const flowerMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+    const centerMat = new THREE.MeshLambertMaterial({ color: 0xfbc02d });
+    const f1 = new THREE.Mesh(new THREE.CircleGeometry(0.09, 5), flowerMat);
+    f1.rotation.x = -Math.PI / 3;
+    f1.position.set(0.15, 0.48, 0.15);
+    group.add(f1);
+    const fCenter = new THREE.Mesh(new THREE.SphereGeometry(0.035, 4, 4), centerMat);
+    fCenter.position.set(0.15, 0.49, 0.15);
+    group.add(fCenter);
+
+    return group;
+  }
+
+  function createCornMesh(isGolden) {
+    const group = new THREE.Group();
+    const stalkMat = new THREE.MeshLambertMaterial({ color: 0x388e3c });
+    const leafMat = new THREE.MeshLambertMaterial({ color: 0x43a047 });
+    const huskMat = new THREE.MeshLambertMaterial({ color: 0x81c784 });
+    const kernelMat = new THREE.MeshLambertMaterial({ color: isGolden ? 0xffd700 : 0xffd600 });
+    const silkMat = new THREE.MeshLambertMaterial({ color: 0x8d6e63 });
+
+    // Tall Stalk
+    const stalk = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.11, 2.0, 6), stalkMat);
+    stalk.position.y = 1.0;
+    group.add(stalk);
+
+    // Arching Corn Leaves
+    for (let i = 0; i < 5; i++) {
+      const leaf = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.02, 0.7), leafMat);
+      const ang = (i / 5) * Math.PI * 2;
+      leaf.position.set(Math.cos(ang) * 0.35, 0.6 + (i * 0.25), Math.sin(ang) * 0.35);
+      leaf.rotation.y = ang;
+      leaf.rotation.x = 0.45;
+      group.add(leaf);
+    }
+
+    // 2 Ears of Corn on the stalk
+    [0.75, 1.25].forEach((cy, idx) => {
+      const cobGroup = new THREE.Group();
+      // Yellow Corn Ear
+      const ear = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 0.5, 6), kernelMat);
+      cobGroup.add(ear);
+      // Husk leaves wrapping ear
+      const husk = new THREE.Mesh(new THREE.ConeGeometry(0.15, 0.4, 4), huskMat);
+      husk.position.y = -0.1;
+      cobGroup.add(husk);
+      // Silk on top
+      const silk = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.08, 0.15, 4), silkMat);
+      silk.position.y = 0.3;
+      cobGroup.add(silk);
+
+      const sideAng = idx === 0 ? 0.6 : -0.6;
+      cobGroup.position.set(Math.sin(sideAng) * 0.18, cy, Math.cos(sideAng) * 0.18);
+      cobGroup.rotation.z = sideAng * 0.5;
+      group.add(cobGroup);
+    });
+
+    return group;
+  }
+
+  function createWatermelonMesh(isGolden) {
+    const group = new THREE.Group();
+    // Vines on ground
+    const vineMat = new THREE.MeshLambertMaterial({ color: 0x2e7d32 });
+    for (let i = 0; i < 4; i++) {
+      const v = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.04, 0.8), vineMat);
+      const ang = (i / 4) * Math.PI * 2;
+      v.position.set(Math.cos(ang) * 0.5, 0.05, Math.sin(ang) * 0.5);
+      v.rotation.y = ang;
+      group.add(v);
+    }
+
+    // Large Striped Watermelon
+    const melonMat = new THREE.MeshLambertMaterial({ color: isGolden ? 0xffd700 : 0x2e7d32 });
+    const melon = new THREE.Mesh(new THREE.SphereGeometry(0.55, 9, 8), melonMat);
+    melon.scale.set(1.35, 1.0, 1.0);
+    melon.position.y = 0.48;
+
+    // Light Green Stripes
+    if (!isGolden) {
+      const stripeMat = new THREE.MeshLambertMaterial({ color: 0x81c784 });
+      for (let s = 0; s < 4; s++) {
+        const stripe = new THREE.Mesh(new THREE.TorusGeometry(0.48, 0.04, 4, 8), stripeMat);
+        stripe.scale.set(1.36, 1.01, 1.01);
+        stripe.rotation.y = (s / 4) * Math.PI;
+        melon.add(stripe);
+      }
+    }
+    group.add(melon);
+    return group;
+  }
+
+  function createSunflowerMesh(isGolden) {
+    const group = new THREE.Group();
+    const stemMat = new THREE.MeshLambertMaterial({ color: 0x388e3c });
+    const leafMat = new THREE.MeshLambertMaterial({ color: 0x4caf50 });
+    const petalMat = new THREE.MeshLambertMaterial({ color: 0xffeb3b });
+    const centerMat = new THREE.MeshLambertMaterial({ color: 0x3e2723 });
+
+    // Robust Stalk
+    const stalk = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 1.8, 6), stemMat);
+    stalk.position.y = 0.9;
+    group.add(stalk);
+
+    // Big Heart-shaped leaves
+    for (let i = 0; i < 4; i++) {
+      const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.3, 5, 4), leafMat);
+      leaf.scale.set(1.5, 0.2, 1.0);
+      const ang = (i / 4) * Math.PI * 2;
+      leaf.position.set(Math.cos(ang) * 0.35, 0.45 + (i * 0.3), Math.sin(ang) * 0.35);
+      leaf.rotation.y = ang;
+      group.add(leaf);
+    }
+
+    // Flower Head Facing Player
+    const headGroup = new THREE.Group();
+    headGroup.position.set(0, 1.75, 0.2);
+    headGroup.rotation.x = -Math.PI / 8;
+
+    // Dark Seed Disc
+    const center = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 0.1, 10), centerMat);
+    center.rotation.x = Math.PI / 2;
+    headGroup.add(center);
+
+    // 12 Radiating Golden Petals
+    for (let p = 0; p < 12; p++) {
+      const petal = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.45, 4), petalMat);
+      const pAng = (p / 12) * Math.PI * 2;
+      petal.position.set(Math.cos(pAng) * 0.45, Math.sin(pAng) * 0.45, 0);
+      petal.rotation.z = pAng - Math.PI / 2;
+      headGroup.add(petal);
+    }
+
+    group.add(headGroup);
+    return group;
+  }
+
   function render3DCrop(plot) {
     while (plot.cropGroup.children.length > 0) {
       plot.cropGroup.remove(plot.cropGroup.children[0]);
     }
     if (!plot.planted) return;
 
-    const crop = CROPS[plot.planted];
-    const scale = 0.25 + (plot.stage / 3) * 0.75;
-
+    let model;
     if (plot.stage === 1) {
-      const sprout = new THREE.Mesh(new THREE.ConeGeometry(0.15, 0.4, 5), new THREE.MeshLambertMaterial({ color: 0x76ff03 }));
-      sprout.position.y = 0.2;
-      plot.cropGroup.add(sprout);
+      model = createSproutMesh();
     } else if (plot.stage === 2) {
-      const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.15, 0.8, 6), new THREE.MeshLambertMaterial({ color: 0x4caf50 }));
-      stem.position.y = 0.4;
-      plot.cropGroup.add(stem);
-    } else {
-      const matColor = plot.isGolden ? 0xFFD700 : crop.col;
-      const mat = new THREE.MeshLambertMaterial({ color: matColor });
-      let fruit;
-      if (plot.planted === 'pumpkin') {
-        fruit = new THREE.Mesh(new THREE.SphereGeometry(0.45, 8, 8), mat);
-        fruit.scale.set(1.2, 0.9, 1.2);
-      } else if (plot.planted === 'carrot') {
-        fruit = new THREE.Mesh(new THREE.ConeGeometry(0.28, 0.8, 6), mat);
-        fruit.rotation.x = Math.PI;
-      } else if (plot.planted === 'wheat' || plot.planted === 'corn') {
-        fruit = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.15, 1.1, 5), mat);
-      } else if (plot.planted === 'sunflower') {
-        fruit = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.1, 8), mat);
-        fruit.rotation.x = Math.PI / 3;
-      } else {
-        fruit = new THREE.Mesh(new THREE.DodecahedronGeometry(0.4), mat);
-      }
-      fruit.position.y = 0.5;
-      fruit.castShadow = true;
-      plot.cropGroup.add(fruit);
+      model = createGrowingBushMesh(CROPS[plot.planted].col);
+    } else { // Stage 3: Fully Grown High-Def 3D Model
+      const type = plot.planted;
+      if (type === 'wheat') model = createWheatMesh(plot.isGolden);
+      else if (type === 'carrot') model = createCarrotMesh(plot.isGolden);
+      else if (type === 'tomato') model = createTomatoMesh(plot.isGolden);
+      else if (type === 'pumpkin') model = createPumpkinMesh(plot.isGolden);
+      else if (type === 'strawberry') model = createStrawberryMesh(plot.isGolden);
+      else if (type === 'corn') model = createCornMesh(plot.isGolden);
+      else if (type === 'watermelon') model = createWatermelonMesh(plot.isGolden);
+      else if (type === 'sunflower') model = createSunflowerMesh(plot.isGolden);
+      else model = createWheatMesh(plot.isGolden);
     }
-    plot.cropGroup.scale.set(scale, scale, scale);
+
+    plot.cropGroup.add(model);
   }
+
+  // --- DETAILED PROCEDURAL 3D ANIMALS ---
 
   function buildAnimals() {
     g.animals.forEach(a => spawnAnimalMesh(a));
 
+    // Farm Dog (Max)
     dogMesh = new THREE.Group();
-    const dogBody = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.4, 0.7), new THREE.MeshLambertMaterial({ color: 0xc87d32 }));
-    dogBody.position.y = 0.35;
+    const dogBody = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.42, 0.75), new THREE.MeshLambertMaterial({ color: 0xc87d32 }));
+    dogBody.position.y = 0.38;
     dogBody.castShadow = true;
     dogMesh.add(dogBody);
+
+    // White Chest Patch
+    const chest = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.3), new THREE.MeshLambertMaterial({ color: 0xffffff }));
+    chest.position.set(0, 0.38, 0.38);
+    dogMesh.add(chest);
+
+    // Head with Floppy Ears
     const dogHead = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.35, 0.35), new THREE.MeshLambertMaterial({ color: 0xc87d32 }));
-    dogHead.position.set(0, 0.65, 0.35);
+    dogHead.position.set(0, 0.7, 0.35);
     dogMesh.add(dogHead);
-    const snout = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.15, 0.2), new THREE.MeshLambertMaterial({ color: 0x4e342e }));
-    snout.position.set(0, 0.6, 0.55);
+
+    const earL = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.22, 0.1), new THREE.MeshLambertMaterial({ color: 0x8d5b2d }));
+    earL.position.set(-0.2, 0.65, 0.35);
+    dogMesh.add(earL);
+    const earR = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.22, 0.1), new THREE.MeshLambertMaterial({ color: 0x8d5b2d }));
+    earR.position.set(0.2, 0.65, 0.35);
+    dogMesh.add(earR);
+
+    // Snout with Dark Nose
+    const snout = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.16, 0.22), new THREE.MeshLambertMaterial({ color: 0x5d4037 }));
+    snout.position.set(0, 0.65, 0.56);
     dogMesh.add(snout);
-    dogTail = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.25, 0.08), new THREE.MeshLambertMaterial({ color: 0xc87d32 }));
-    dogTail.position.set(0, 0.5, -0.4);
+    const nose = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.06, 0.04), new THREE.MeshLambertMaterial({ color: 0x212121 }));
+    nose.position.set(0, 0.7, 0.68);
+    dogMesh.add(nose);
+
+    // Red Collar with Gold Tag
+    const collar = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.08, 8), new THREE.MeshLambertMaterial({ color: 0xd32f2f }));
+    collar.position.set(0, 0.54, 0.32);
+    dogMesh.add(collar);
+    const tag = new THREE.Mesh(new THREE.SphereGeometry(0.04, 4, 4), new THREE.MeshLambertMaterial({ color: 0xffd700 }));
+    tag.position.set(0, 0.52, 0.48);
+    dogMesh.add(tag);
+
+    // Wagging Tail
+    dogTail = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.28, 0.08), new THREE.MeshLambertMaterial({ color: 0xc87d32 }));
+    dogTail.position.set(0, 0.52, -0.42);
     dogTail.rotation.x = -Math.PI / 4;
     dogMesh.add(dogTail);
+
     dogMesh.position.set(2, 0, 4);
     scene.add(dogMesh);
   }
 
   function spawnAnimalMesh(a) {
     const mesh = new THREE.Group();
+
     if (a.type === 'chicken') {
-      const b = new THREE.Mesh(new THREE.SphereGeometry(0.25, 6, 6), new THREE.MeshLambertMaterial({ color: 0xffffff }));
-      b.position.y = 0.25;
-      mesh.add(b);
-      const beak = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.15, 4), new THREE.MeshLambertMaterial({ color: 0xffa000 }));
+      // White Plump Body
+      const body = new THREE.Mesh(new THREE.SphereGeometry(0.28, 7, 7), new THREE.MeshLambertMaterial({ color: 0xffffff }));
+      body.scale.set(0.9, 1.0, 1.2);
+      body.position.y = 0.3;
+      mesh.add(body);
+
+      // Red Wobbly Comb
+      const comb = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.16, 4), new THREE.MeshLambertMaterial({ color: 0xe53935 }));
+      comb.position.set(0, 0.54, 0.15);
+      mesh.add(comb);
+
+      // Yellow Beak & Red Wattle
+      const beak = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.15, 4), new THREE.MeshLambertMaterial({ color: 0xffa000 }));
       beak.rotation.x = Math.PI / 2;
-      beak.position.set(0, 0.3, 0.22);
+      beak.position.set(0, 0.36, 0.32);
       mesh.add(beak);
+      const wattle = new THREE.Mesh(new THREE.SphereGeometry(0.05, 4, 4), new THREE.MeshLambertMaterial({ color: 0xe53935 }));
+      wattle.position.set(0, 0.26, 0.26);
+      mesh.add(wattle);
+
+      // Wings on sides
+      const wingL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.18, 0.26), new THREE.MeshLambertMaterial({ color: 0xf5f5f5 }));
+      wingL.position.set(-0.25, 0.3, 0);
+      mesh.add(wingL);
+      const wingR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.18, 0.26), new THREE.MeshLambertMaterial({ color: 0xf5f5f5 }));
+      wingR.position.set(0.25, 0.3, 0);
+      mesh.add(wingR);
+
     } else if (a.type === 'cow') {
-      const b = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.6, 1.2), new THREE.MeshLambertMaterial({ color: 0xf5f5f5 }));
-      b.position.y = 0.5;
-      mesh.add(b);
-      const h = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.4), new THREE.MeshLambertMaterial({ color: 0x212121 }));
-      h.position.set(0, 0.8, 0.6);
-      mesh.add(h);
+      // Holstein White Body
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.65, 1.3), new THREE.MeshLambertMaterial({ color: 0xf5f5f5 }));
+      body.position.y = 0.55;
+      mesh.add(body);
+
+      // Black Spots on Body
+      const spot1 = new THREE.Mesh(new THREE.PlaneGeometry(0.4, 0.35), new THREE.MeshLambertMaterial({ color: 0x212121 }));
+      spot1.position.set(0.43, 0.6, 0.2);
+      spot1.rotation.y = Math.PI / 2;
+      mesh.add(spot1);
+      const spot2 = new THREE.Mesh(new THREE.PlaneGeometry(0.35, 0.3), new THREE.MeshLambertMaterial({ color: 0x212121 }));
+      spot2.position.set(-0.43, 0.55, -0.25);
+      spot2.rotation.y = -Math.PI / 2;
+      mesh.add(spot2);
+
+      // Head & Pink Muzzle
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.45, 0.45), new THREE.MeshLambertMaterial({ color: 0x212121 }));
+      head.position.set(0, 0.85, 0.65);
+      mesh.add(head);
+      const muzzle = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.22, 0.2), new THREE.MeshLambertMaterial({ color: 0xf8bbd0 }));
+      muzzle.position.set(0, 0.75, 0.88);
+      mesh.add(muzzle);
+
+      // Horns
+      const hornL = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.18, 4), new THREE.MeshLambertMaterial({ color: 0xd7ccc8 }));
+      hornL.position.set(-0.2, 1.12, 0.65);
+      hornL.rotation.z = -0.3;
+      mesh.add(hornL);
+      const hornR = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.18, 4), new THREE.MeshLambertMaterial({ color: 0xd7ccc8 }));
+      hornR.position.set(0.2, 1.12, 0.65);
+      hornR.rotation.z = 0.3;
+      mesh.add(hornR);
+
+      // Pink Udder
+      const udder = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.18, 0.35), new THREE.MeshLambertMaterial({ color: 0xf8bbd0 }));
+      udder.position.set(0, 0.22, -0.2);
+      mesh.add(udder);
+
     } else if (a.type === 'sheep') {
-      const b = new THREE.Mesh(new THREE.DodecahedronGeometry(0.5, 1), new THREE.MeshLambertMaterial({ color: 0xffffff }));
-      b.position.y = 0.45;
-      mesh.add(b);
-    } else {
-      const b = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.45, 0.9), new THREE.MeshLambertMaterial({ color: 0xf48fb1 }));
-      b.position.y = 0.4;
-      mesh.add(b);
+      // Fluffy Cloud Body (6 Clustered Wool Spheres)
+      const woolMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+      const woolGroup = new THREE.Group();
+      for (let i = 0; i < 6; i++) {
+        const wSphere = new THREE.Mesh(new THREE.SphereGeometry(0.32, 6, 6), woolMat);
+        const wAng = (i / 6) * Math.PI * 2;
+        wSphere.position.set(Math.cos(wAng) * 0.24, 0.5 + ((i % 2) * 0.08), Math.sin(wAng) * 0.35);
+        woolGroup.add(wSphere);
+      }
+      mesh.add(woolGroup);
+
+      // Black Face & Ears
+      const face = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.35), new THREE.MeshLambertMaterial({ color: 0x2e2e2e }));
+      face.position.set(0, 0.62, 0.52);
+      mesh.add(face);
+      const earL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.08, 0.08), new THREE.MeshLambertMaterial({ color: 0x2e2e2e }));
+      earL.position.set(-0.22, 0.65, 0.45);
+      mesh.add(earL);
+      const earR = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.08, 0.08), new THREE.MeshLambertMaterial({ color: 0x2e2e2e }));
+      earR.position.set(0.22, 0.65, 0.45);
+      mesh.add(earR);
+
+    } else { // Pig
+      // Cute Pink Rounded Body
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.52, 0.95), new THREE.MeshLambertMaterial({ color: 0xf48fb1 }));
+      body.position.y = 0.45;
+      mesh.add(body);
+
+      // Head, Floppy Ears & Pig Snout
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.38, 0.38), new THREE.MeshLambertMaterial({ color: 0xf48fb1 }));
+      head.position.set(0, 0.62, 0.52);
+      mesh.add(head);
+
+      const snout = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.18, 0.12), new THREE.MeshLambertMaterial({ color: 0xf06292 }));
+      snout.position.set(0, 0.58, 0.72);
+      mesh.add(snout);
+
+      const earL = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.16, 4), new THREE.MeshLambertMaterial({ color: 0xf06292 }));
+      earL.position.set(-0.18, 0.82, 0.48);
+      earL.rotation.z = -0.5;
+      mesh.add(earL);
+      const earR = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.16, 4), new THREE.MeshLambertMaterial({ color: 0xf06292 }));
+      earR.position.set(0.18, 0.82, 0.48);
+      earR.rotation.z = 0.5;
+      mesh.add(earR);
+
+      // Curly Tail
+      const tail = new THREE.Mesh(new THREE.TorusGeometry(0.08, 0.03, 4, 6), new THREE.MeshLambertMaterial({ color: 0xf06292 }));
+      tail.position.set(0, 0.52, -0.5);
+      mesh.add(tail);
     }
+
     mesh.position.set(a.x, 0, a.z);
     scene.add(mesh);
     animalEntities.push({ data: a, mesh });
@@ -613,7 +1183,7 @@
     }));
   }
 
-  // --- ACTIONS ---
+  // --- ACTIONS & PROXIMITY ---
   function selectTool(toolKey) {
     if (CROPS[toolKey] && CROPS[toolKey].unlockLvl > g.level) {
       toast(`🔒 Se desbloquea en Nivel ${CROPS[toolKey].unlockLvl}`);
@@ -1045,7 +1615,7 @@
     camera.position.lerp(new THREE.Vector3(targetCamX, targetCamY, targetCamZ), 0.08);
     camera.lookAt(player.position.x, player.position.y + 1, player.position.z);
 
-    // Crops growth
+    // Crops growth & subtle wind sway
     plots.forEach(p => {
       if (p.planted && !p.ready) {
         const crop = CROPS[p.planted];
@@ -1057,6 +1627,16 @@
           p.stage++;
           if (p.stage >= 3) p.ready = true;
           render3DCrop(p);
+        }
+      }
+
+      // Gentle wind breeze animation on crops
+      if (p.cropGroup && p.stage > 1) {
+        p.cropGroup.rotation.z = Math.sin(now * 0.003 + p.c) * 0.05;
+        // Bouncy squash & stretch when ready to harvest
+        if (p.ready) {
+          const bounce = 1.0 + Math.sin(now * 0.006 + p.r) * 0.08;
+          p.cropGroup.scale.set(bounce, bounce, bounce);
         }
       }
     });
