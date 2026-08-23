@@ -1311,26 +1311,30 @@
     function givePickup(type) {
       AU.init(); AU.resume();
       if (type === 'medkit') {
-        if (hp >= CFG.hpMax) return false;
-        hp = Math.min(CFG.hpMax, hp + 45);
+        const healAmt = 45;
+        const oldHp = hp;
+        hp = Math.min(CFG.hpMax, hp + healAmt);
+        stamina = CFG.stamMax;
         refreshVitals();
         sfxPickup();
-        showToast('+45 DE SALUD');
+        if (oldHp < CFG.hpMax) {
+          showToast(`+${Math.round(hp - oldHp)} DE SALUD`);
+        } else {
+          showToast('ENERGÍA RESTAURADA AL 100%');
+        }
         return true;
       }
       if (type === 'ammo') {
-        let got = false;
-        for (const id in weapons) {
+        for (const id in WEAPONS) {
           if (id === 'pistol') continue;
-          const w = WEAPONS[id];
-          const gain = Math.round(w.magSize * 1.5);
-          if (weapons[id].reserve < w.reserveCap) {
-            weapons[id].reserve = Math.min(w.reserveCap, weapons[id].reserve + gain);
-            got = true;
+          if (weapons[id]) {
+            const w = WEAPONS[id];
+            const gain = Math.round(w.magSize * 1.5);
+            weapons[id].reserve = Math.min(w.reserveCap, (weapons[id].reserve || 0) + gain);
           }
         }
-        if (!got) return false;
         refreshWeaponHUD();
+        updateWeaponBarUI();
         sfxPickup();
         showToast('MUNICIÓN REABASTECIDA');
         return true;
@@ -1341,14 +1345,17 @@
       if (w) {
         if (!unlockedWeapons[type]) {
           unlockedWeapons[type] = true;
-          weapons[type] = { mag: w.magSize, reserve: w.reserveStart };
+          if (!weapons[type]) {
+            weapons[type] = { mag: w.magSize, reserve: w.reserveStart };
+          }
           switchWeapon(type);
           sfxPickup();
           showToast(`¡${w.name} DESBLOQUEADA!`);
           updateWeaponBarUI();
         } else {
-          weapons[type].reserve = Math.min(w.reserveCap, weapons[type].reserve + w.magSize * 2);
+          weapons[type].reserve = Math.min(w.reserveCap, (weapons[type].reserve || 0) + w.magSize * 2);
           refreshWeaponHUD();
+          updateWeaponBarUI();
           sfxPickup();
           showToast(`+MUNICIÓN ${w.name}`);
         }
@@ -1372,8 +1379,11 @@
     function checkPickups() {
       for (let i = pickupsArr.length - 1; i >= 0; i--) {
         const p = pickupsArr[i];
-        if (Math.hypot(p.g.position.x - playerPos.x, p.g.position.z - playerPos.z) < 1.4) {
-          if (givePickup(p.type)) removePickup(i);
+        if (Math.hypot(p.g.position.x - playerPos.x, p.g.position.z - playerPos.z) < 1.6) {
+          if (givePickup(p.type)) {
+            spawnBurst(p.g.position.clone().add(new THREE.Vector3(0, 0.4, 0)), [0x00f0ff, 0xffffff, 0x7ec850], 10, 2.5, 4, 0.4, 0.08);
+            removePickup(i);
+          }
         }
       }
     }
