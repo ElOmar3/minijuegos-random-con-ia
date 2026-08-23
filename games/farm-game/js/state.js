@@ -52,22 +52,26 @@ export function loadGame() {
     if (!raw) return;
     const data = JSON.parse(raw);
     Object.assign(g, data);
-    // Migración segura para partidas creadas antes de añadir nuevas estadísticas.
+    g.plots = Array.isArray(data.plots) ? data.plots : [];
+    g.inventory = data.inventory || {};
     g.upgrades = { water: 0, speed: 0, inv: 0, market: 0, ...(data.upgrades || {}) };
     g.stats = {
       planted: 0, harvested: 0, sold: 0, totalEarned: 0, cooked: 0, animalsBought: 0,
       ...(data.stats || {})
     };
-    g.plots = Array.isArray(data.plots) ? data.plots : [];
-    g.animals = (data.animals || []).map((a, i) => ({
-      type: a.type,
-      x: -10 - (i % 3) * 2,
-      z: 4 + Math.floor(i / 3) * 2,
-      tx: -10 - (i % 3) * 2,
-      tz: 4 + Math.floor(i / 3) * 2,
-      timer: 0
-    }));
-  } catch(e) {}
+    g.animals = (Array.isArray(data.animals) && data.animals.length > 0)
+      ? data.animals.map((a, i) => ({
+          type: a.type || 'chicken',
+          x: -10 - (i % 3) * 2,
+          z: 4 + Math.floor(i / 3) * 2,
+          tx: -10 - (i % 3) * 2,
+          tz: 4 + Math.floor(i / 3) * 2,
+          timer: 0
+        }))
+      : [{ type: 'chicken', x: -10, z: 4, tx: -10, tz: 4, timer: 0 }];
+  } catch(e) {
+    console.error('Error al cargar partida:', e);
+  }
 }
 
 export function countInv() {

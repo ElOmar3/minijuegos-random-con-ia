@@ -11,6 +11,8 @@ export function initWorld(container) {
   scene.fog = new THREE.Fog(0x87CEEB, 35, 80);
 
   camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.set(12, 16, 18);
+  camera.lookAt(0, 1, 4);
   
   renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
   renderer.setSize(window.innerWidth, window.innerHeight);

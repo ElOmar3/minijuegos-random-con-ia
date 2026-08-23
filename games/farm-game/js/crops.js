@@ -28,7 +28,7 @@ export function initCrops(g) {
       const cropGroup = new THREE.Group();
       soil.add(cropGroup);
 
-      const saved = g.plots[plots.length] || {};
+      const saved = (Array.isArray(g.plots) && g.plots[plots.length]) || {};
       const plot = {
         r, c, mesh: soil, cropGroup,
         planted: saved.planted || null,
