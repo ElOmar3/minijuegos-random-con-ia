@@ -226,4 +226,8 @@ function gameLoop(now) {
 }
 
 // Start game when page loads
-window.addEventListener('DOMContentLoaded', init);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}

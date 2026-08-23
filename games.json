@@ -30,9 +30,9 @@
     "dificultad": "fácil",
     "dificultad_creacion": "Media",
     "esfuerzo_ia": "Alto (4/5)",
-    "ia": "MiMo V2.5 + Gemini 3.7 Flash + OpenAI Codex",
+    "ia": "GPT Terra",
     "tecnologia": "Three.js 3D / Web Audio / Modular JS",
     "carpeta": "games/farm-game",
-    "miniatura": ""
+    "miniatura": "games/farm-game/thumbnail.svg"
   }
 ]
