@@ -22,5 +22,17 @@
     "tecnologia": "Three.js 3D / Web Audio / nipple.js",
     "carpeta": "games/brote-cero",
     "miniatura": "games/brote-cero/thumbnail.png"
+  },
+  {
+    "id": "farm-game",
+    "titulo": "Granja Mágica 3D",
+    "descripcion": "Aventura de granja 3D low-poly en tercera persona: cultiva, riega, cosecha, cocina recetas y cuida animales con tu perro.",
+    "dificultad": "fácil",
+    "dificultad_creacion": "Media",
+    "esfuerzo_ia": "Alto (4/5)",
+    "ia": "MiMo V2.5 + Gemini 3.7 Flash",
+    "tecnologia": "Three.js 3D / Web Audio / Modular JS",
+    "carpeta": "games/farm-game",
+    "miniatura": ""
   }
 ]

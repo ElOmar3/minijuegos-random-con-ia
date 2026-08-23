@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Granja 3D — Cozy Farm Adventure 🌾✨</title>
+<link rel="stylesheet" href="style.css">
+<!-- Three.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+<div id="webgl-container"></div>
+
+<div id="hud">
+  <!-- Top Bar -->
+  <div id="topbar">
+    <div class="hud-group">
+      <div class="st-badge gold">🪙 <span id="coins">100</span></div>
+      <div class="st-badge">💎 <span id="gems">5</span></div>
+      <div class="st-badge xp-badge">
+        <div class="xp-fill" id="xp-bar" style="width: 0%;"></div>
+        <div class="xp-content">⭐ Nv.<span id="lvl">1</span></div>
+      </div>
+    </div>
+
+    <div class="hud-group">
+      <div class="st-badge">📅 Día <span id="day">1</span> (<span id="time-str">08:00</span>)</div>
+      <div class="st-badge"><span id="sei">🌸</span> Primavera</div>
+      <button class="top-btn" id="snd-toggle" title="Audio">🔊</button>
+    </div>
+  </div>
+
+  <!-- Mission Banner -->
+  <div id="mission-banner">
+    🎯 <span id="mission-txt">🌱 Sembrar 3 cultivos</span>
+  </div>
+
+  <div id="control-hint">WASD / flechas para moverte · <b>E</b> para usar · <b>1–0</b> para herramientas</div>
+
+  <!-- Proximity Action Prompt -->
+  <div id="action-prompt">
+    <span id="prompt-icon">🌱</span> <span id="prompt-txt">Plantar Trigo</span>
+  </div>
+
+  <!-- Bottom Container: Hotbar + Actions -->
+  <div id="bottom-container">
+    <div id="hotbar">
+      <div class="tool-slot active" id="slot-hand" title="Mano / Cosechar">
+        <span>✋</span><span class="sub-lbl">Mano</span>
+      </div>
+      <div class="tool-slot" id="slot-water" title="Regadera">
+        <span>💧</span><span class="sub-lbl">Regar</span>
+      </div>
+      <div class="tool-slot" id="slot-wheat" title="Semilla de Trigo">
+        <span>🌾</span><span class="sub-lbl">Trigo</span>
+      </div>
+      <div class="tool-slot" id="slot-carrot" title="Semilla de Zanahoria">
+        <span>🥕</span><span class="sub-lbl">Zanahoria</span>
+      </div>
+      <div class="tool-slot" id="slot-tomato" title="Semilla de Tomate">
+        <span>🍅</span><span class="sub-lbl">Tomate</span>
+      </div>
+      <div class="tool-slot" id="slot-pumpkin" title="Semilla de Calabaza">
+        <span>🎃</span><span class="sub-lbl">Calabaza</span>
+      </div>
+      <div class="tool-slot" id="slot-strawberry" title="Semilla de Fresa">
+        <span>🍓</span><span class="sub-lbl">Fresa</span>
+      </div>
+      <div class="tool-slot" id="slot-corn" title="Semilla de Maíz">
+        <span>🌽</span><span class="sub-lbl">Maíz</span>
+      </div>
+      <div class="tool-slot" id="slot-watermelon" title="Semilla de Sandía">
+        <span>🍉</span><span class="sub-lbl">Sandía</span>
+      </div>
+      <div class="tool-slot" id="slot-sunflower" title="Semilla de Girasol">
+        <span>🌻</span><span class="sub-lbl">Girasol</span>
+      </div>
+    </div>
+
+    <div id="bottombar">
+      <button class="btn-farm bshop" id="btn-shop">🛒 Tienda</button>
+      <button class="btn-farm binv" id="btn-inv">🎒 Mochila (<span id="inv-count">0/30</span>)</button>
+      <button class="btn-farm bcook" id="btn-cook">🍳 Cocina</button>
+      <button class="btn-farm bup" id="btn-upg">⬆️ Mejoras</button>
+      <button class="btn-farm bsell" id="btn-sell">💰 Vender Todo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile Controls -->
+<div id="joystick-zone"><div id="joystick-knob"></div></div>
+<div id="btn-mobile-act">🌾</div>
+
+<!-- Modal & Toasts -->
+<div id="overlay"><div id="modal"></div></div>
+<div id="toast"></div>
+
+<!-- ES Module Main Script -->
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
