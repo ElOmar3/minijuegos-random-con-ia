@@ -784,55 +784,71 @@
 
   function createStrawberryMesh(isGolden) {
     const group = new THREE.Group();
-    // Bushy mound of leaves
-    const bushMat = new THREE.MeshLambertMaterial({ color: 0x2e7d32 });
-    const leafMat = new THREE.MeshLambertMaterial({ color: 0x43a047 });
-    const mound = new THREE.Mesh(new THREE.SphereGeometry(0.5, 7, 6), bushMat);
-    mound.scale.set(1.4, 0.6, 1.4);
-    mound.position.y = 0.25;
-    group.add(mound);
+    const leafMat = new THREE.MeshLambertMaterial({ color: 0x388e3c });
+    const strawMat = new THREE.MeshLambertMaterial({ color: isGolden ? 0xffd700 : 0xff1744 });
+    const capMat = new THREE.MeshLambertMaterial({ color: 0x1b5e20 });
+    const flowerMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+    const centerMat = new THREE.MeshLambertMaterial({ color: 0xfbc02d });
 
-    // Detailed Trifoliate Leaves
+    // 6 Scalloped Green Leaves flat on the ground
     for (let i = 0; i < 6; i++) {
-      const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.2, 5, 4), leafMat);
-      leaf.scale.set(1.3, 0.2, 0.9);
+      const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.24, 6, 4), leafMat);
+      leaf.scale.set(1.4, 0.18, 0.9);
       const ang = (i / 6) * Math.PI * 2;
-      leaf.position.set(Math.cos(ang) * 0.55, 0.28, Math.sin(ang) * 0.55);
+      leaf.position.set(Math.cos(ang) * 0.42, 0.08, Math.sin(ang) * 0.42);
       leaf.rotation.y = ang;
+      leaf.rotation.x = 0.25;
       group.add(leaf);
     }
 
-    // Heart-shaped Red Strawberries
-    const strawMat = new THREE.MeshLambertMaterial({ color: isGolden ? 0xffd700 : 0xe91e63 });
-    const capMat = new THREE.MeshLambertMaterial({ color: 0x1b5e20 });
-    const sPos = [[0.4, 0.25, 0.2], [-0.35, 0.22, 0.3], [0.1, 0.28, -0.42], [-0.38, 0.26, -0.22]];
+    // 4 Large, Vibrant, Delicious Red Strawberries standing up proudly
+    const berryCoords = [
+      { x: 0, y: 0.52, z: 0.1, rotZ: 0.05, rotX: 0.15, sz: 1.25 },
+      { x: -0.32, y: 0.38, z: -0.18, rotZ: -0.35, rotX: -0.2, sz: 1.05 },
+      { x: 0.32, y: 0.38, z: -0.18, rotZ: 0.35, rotX: -0.2, sz: 1.05 },
+      { x: 0, y: 0.32, z: -0.35, rotZ: 0, rotX: -0.4, sz: 0.95 }
+    ];
 
-    sPos.forEach(([sx, sy, sz]) => {
+    berryCoords.forEach(b => {
       const sGroup = new THREE.Group();
-      // Strawberry Cone/Heart
-      const berry = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.3, 7), strawMat);
-      berry.rotation.x = Math.PI;
+      // Berry Cone (Wide top, pointy tip)
+      const berry = new THREE.Mesh(new THREE.ConeGeometry(0.22 * b.sz, 0.45 * b.sz, 8), strawMat);
+      berry.rotation.x = Math.PI; // point downwards
       sGroup.add(berry);
-      // Green Cap
-      const cap = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.05, 5), capMat);
-      cap.position.y = 0.16;
-      sGroup.add(cap);
 
-      sGroup.position.set(sx, sy, sz);
-      sGroup.rotation.z = 0.2;
+      // Star-shaped green calyx crown on top
+      for (let s = 0; s < 5; s++) {
+        const sepal = new THREE.Mesh(new THREE.ConeGeometry(0.06 * b.sz, 0.16 * b.sz, 3), capMat);
+        const sAng = (s / 5) * Math.PI * 2;
+        sepal.position.set(Math.cos(sAng) * (0.13 * b.sz), 0.22 * b.sz, Math.sin(sAng) * (0.13 * b.sz));
+        sepal.rotation.z = Math.cos(sAng) * 0.8;
+        sepal.rotation.x = Math.sin(sAng) * 0.8;
+        sGroup.add(sepal);
+      }
+
+      // Little green stem
+      const sStem = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.15 * b.sz, 4), capMat);
+      sStem.position.y = 0.28 * b.sz;
+      sGroup.add(sStem);
+
+      sGroup.position.set(b.x, b.y, b.z);
+      sGroup.rotation.z = b.rotZ;
+      sGroup.rotation.x = b.rotX;
       group.add(sGroup);
     });
 
-    // White Flowers with Yellow center
-    const flowerMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
-    const centerMat = new THREE.MeshLambertMaterial({ color: 0xfbc02d });
-    const f1 = new THREE.Mesh(new THREE.CircleGeometry(0.09, 5), flowerMat);
-    f1.rotation.x = -Math.PI / 3;
-    f1.position.set(0.15, 0.48, 0.15);
-    group.add(f1);
-    const fCenter = new THREE.Mesh(new THREE.SphereGeometry(0.035, 4, 4), centerMat);
-    fCenter.position.set(0.15, 0.49, 0.15);
-    group.add(fCenter);
+    // 2 Cute White Strawberry Flowers with golden center
+    [{ x: -0.18, y: 0.48, z: 0.28 }, { x: 0.22, y: 0.45, z: 0.26 }].forEach(fp => {
+      const fGroup = new THREE.Group();
+      const petals = new THREE.Mesh(new THREE.CircleGeometry(0.12, 5), flowerMat);
+      petals.rotation.x = -Math.PI / 3;
+      fGroup.add(petals);
+      const fCenter = new THREE.Mesh(new THREE.SphereGeometry(0.045, 4, 4), centerMat);
+      fCenter.position.set(0, 0.03, 0);
+      fGroup.add(fCenter);
+      fGroup.position.set(fp.x, fp.y, fp.z);
+      group.add(fGroup);
+    });
 
     return group;
   }
