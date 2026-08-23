@@ -278,24 +278,112 @@
   }
 
   function buildEnvironment() {
-    // Ground Island
+    // Pradera: una base suave con parches y briznas para evitar el efecto de plano verde.
     const groundGeo = new THREE.PlaneGeometry(85, 85, 16, 16);
-    const groundMat = new THREE.MeshLambertMaterial({ color: 0x5dae3c });
+    const groundMat = new THREE.MeshLambertMaterial({ color: 0x5e9147 });
     const ground = new THREE.Mesh(groundGeo, groundMat);
     ground.rotation.x = -Math.PI / 2;
     ground.receiveShadow = true;
     scene.add(ground);
 
-    // Cobblestone Path with flagstones
-    const pathMat = new THREE.MeshLambertMaterial({ color: 0x9e9e9e });
-    const path = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 24), pathMat);
-    path.rotation.x = -Math.PI / 2;
-    path.position.set(0, 0.01, 0);
-    scene.add(path);
+    const fieldArea = (x, z, margin = 0) => Math.abs(x) < 6.6 + margin && Math.abs(z) < 6.6 + margin;
+    const inCircle = (x, z, cx, cz, radius) => Math.hypot(x - cx, z - cz) < radius;
+    const onPath = (x, z) => (
+      (Math.abs(x - 8.5) < 0.95 && z > -15.5 && z < 13.5) ||
+      (Math.abs(z - 7.3) < 0.95 && x > -9.5 && x < 9.5) ||
+      (Math.abs(x + 8.5) < 0.95 && z > -10.5 && z < 7.8) ||
+      (Math.abs(z + 11) < 0.9 && x > 8 && x < 12.5) ||
+      (Math.abs(z + 8.5) < 0.9 && x > -13.5 && x < -8)
+    );
+    const clearForNature = (x, z) => !fieldArea(x, z, 0.8) && !onPath(x, z)
+      && !inCircle(x, z, -13, -11, 5.4)
+      && !inCircle(x, z, 13, -11, 5.3)
+      && !inCircle(x, z, -11, 7, 5.6)
+      && !inCircle(x, z, 13, 9, 4.8);
 
-    // Trees (Apple & Pine)
-    const treePos = [[-18, -14], [-14, -18], [16, -14], [18, 12], [-18, 16], [14, 16], [-12, -8], [12, -8], [20, 0], [-20, 0], [0, -18]];
+    // Variación de color del suelo, excluyendo las zonas jugables y las rutas.
+    const patchColors = [0x6ba34f, 0x528840, 0x78aa55, 0x4f833d];
+    const random = (() => {
+      let seed = 1937;
+      return () => {
+        seed = (seed * 16807) % 2147483647;
+        return (seed - 1) / 2147483646;
+      };
+    })();
+    for (let i = 0; i < 115; i++) {
+      const x = random() * 76 - 38;
+      const z = random() * 76 - 38;
+      if (!clearForNature(x, z)) continue;
+      const patch = new THREE.Mesh(
+        new THREE.CircleGeometry(0.55 + random() * 1.35, 7),
+        new THREE.MeshLambertMaterial({ color: patchColors[i % patchColors.length], transparent: true, opacity: 0.32 })
+      );
+      patch.rotation.x = -Math.PI / 2;
+      patch.rotation.z = random() * Math.PI;
+      patch.scale.y = 0.6 + random() * 0.5;
+      patch.position.set(x, 0.006, z);
+      scene.add(patch);
+    }
+
+    // Briznas low-poly agrupadas: textura reconocible sin cargar la escena.
+    const grassColors = [0x4f873f, 0x639949, 0x7baa58];
+    grassColors.forEach((color, colorIndex) => {
+      const blades = new THREE.InstancedMesh(
+        new THREE.ConeGeometry(0.075, 0.24, 4),
+        new THREE.MeshLambertMaterial({ color, emissive: color, emissiveIntensity: 0.12 }),
+        85
+      );
+      const matrix = new THREE.Matrix4();
+      let count = 0;
+      while (count < 85) {
+        const x = random() * 76 - 38;
+        const z = random() * 76 - 38;
+        if (!clearForNature(x, z)) continue;
+        const scale = 0.72 + random() * 0.85;
+        matrix.compose(
+          new THREE.Vector3(x, 0.105 * scale, z),
+          new THREE.Quaternion().setFromEuler(new THREE.Euler(0, random() * Math.PI, 0)),
+          new THREE.Vector3(scale, scale, scale)
+        );
+        blades.setMatrixAt(count++, matrix);
+      }
+      blades.count = count;
+      blades.castShadow = colorIndex === 0;
+      scene.add(blades);
+    });
+
+    // Senderos de piedras: rodean el campo en vez de dividir las parcelas.
+    const pathGroup = new THREE.Group();
+    const pathMaterials = [0xb9ae99, 0xcabfa9, 0xa89e8d].map(color => new THREE.MeshLambertMaterial({ color }));
+    const addStonePath = (fromX, fromZ, toX, toZ) => {
+      const dx = toX - fromX;
+      const dz = toZ - fromZ;
+      const distance = Math.hypot(dx, dz);
+      const steps = Math.ceil(distance / 1.05);
+      const angle = Math.atan2(dx, dz);
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        const stone = new THREE.Mesh(
+          new THREE.BoxGeometry(1.18, 0.10, 0.78),
+          pathMaterials[i % pathMaterials.length]
+        );
+        stone.position.set(fromX + dx * t, 0.055, fromZ + dz * t);
+        stone.rotation.y = angle + (i % 2 ? 0.04 : -0.035);
+        stone.receiveShadow = true;
+        pathGroup.add(stone);
+      }
+    };
+    addStonePath(8.5, -14.5, 8.5, 12.5);       // ruta principal del lado este
+    addStonePath(-8.5, 7.3, 8.5, 7.3);         // acceso sur del cultivo
+    addStonePath(-8.5, -9.5, -8.5, 7.3);       // conexión hacia el granero
+    addStonePath(8.5, -11, 12.2, -11);         // entrada al molino
+    addStonePath(-8.5, -8.5, -13, -8.5);       // entrada al granero
+    scene.add(pathGroup);
+
+    // Árboles exclusivamente en el perímetro; clearForNature protege edificios, corral y molino.
+    const treePos = [[-22, -17], [-18, -21], [-23, -4], [-22, 14], [-15, 20], [-4, -21], [5, -21], [20, -18], [23, -4], [22, 15], [12, 21], [0, 21]];
     treePos.forEach((p, idx) => {
+      if (!clearForNature(p[0], p[1])) return;
       const tree = new THREE.Group();
       const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.35, 1.4, 6), new THREE.MeshLambertMaterial({ color: 0x6d4c41 }));
       trunk.position.y = 0.7;
@@ -326,6 +414,8 @@
         tree.add(cone2);
       }
       tree.position.set(p[0], 0, p[1]);
+      const scale = 0.84 + (idx % 3) * 0.08;
+      tree.scale.setScalar(scale);
       scene.add(tree);
     });
 
@@ -385,14 +475,24 @@
     lily.position.set(12.2, 0.03, 8.5);
     scene.add(lily);
 
-    // Animal Pasture Fence
+    // Corral completo con postes: evita que parezca una valla flotando.
     const fenceMat = new THREE.MeshLambertMaterial({ color: 0x8d6e63 });
-    const fenceTop = new THREE.Mesh(new THREE.BoxGeometry(8, 0.5, 0.15), fenceMat);
-    fenceTop.position.set(-11, 0.25, 3);
-    scene.add(fenceTop);
-    const fenceBot = new THREE.Mesh(new THREE.BoxGeometry(8, 0.5, 0.15), fenceMat);
-    fenceBot.position.set(-11, 0.25, 11);
-    scene.add(fenceBot);
+    const addFence = (x, z, width, depth) => {
+      const rail = new THREE.Mesh(new THREE.BoxGeometry(width, 0.12, depth), fenceMat);
+      rail.position.set(x, 0.48, z);
+      rail.castShadow = true;
+      scene.add(rail);
+    };
+    addFence(-11, 3, 8, 0.16);
+    addFence(-11, 11, 8, 0.16);
+    addFence(-15, 7, 0.16, 8);
+    addFence(-7, 7, 0.16, 8);
+    [[-15, 3], [-7, 3], [-15, 11], [-7, 11]].forEach(([x, z]) => {
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.15, 1.15, 5), fenceMat);
+      post.position.set(x, 0.58, z);
+      post.castShadow = true;
+      scene.add(post);
+    });
   }
 
   function buildPlayer() {
@@ -475,7 +575,8 @@
     armR.add(toolWaterCan);
     player.add(armR);
 
-    player.position.set(0, 0, 4);
+    // Acceso sur del campo: no aparece sobre una parcela ni sobre el camino.
+    player.position.set(0, 0, 5.8);
     scene.add(player);
 
     setupControls();
