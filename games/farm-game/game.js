@@ -235,8 +235,8 @@
   function initWorld() {
     const container = document.getElementById('webgl-container');
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x87CEEB);
-    scene.fog = new THREE.Fog(0x87CEEB, 35, 80);
+    scene.background = new THREE.Color(0x6ea8cd);
+    scene.fog = new THREE.Fog(0x6ea8cd, 40, 85);
 
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(12, 16, 18);
@@ -255,11 +255,11 @@
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // Warm Ambient & Sun Lights
-    hemiLight = new THREE.HemisphereLight(0xffffff, 0x446622, 0.75);
+    // Soft, Eye-Friendly Ambient & Sun Lights (Cozy Pastel Palette)
+    hemiLight = new THREE.HemisphereLight(0xe3f2fd, 0x4b7c3d, 0.42);
     scene.add(hemiLight);
 
-    dirLight = new THREE.DirectionalLight(0xfffaed, 0.9);
+    dirLight = new THREE.DirectionalLight(0xfff8e7, 0.52);
     dirLight.position.set(20, 35, 20);
     dirLight.castShadow = true;
     dirLight.shadow.mapSize.width = 1024;
@@ -1581,15 +1581,36 @@
       updateHUD();
     }
 
-    // Day/Night Sky & Lights
+    // Day/Night Soft Sky & Comfortable Lighting
     const t = g.timeMin / 1440;
-    let skyHex = 0x87CEEB, lightIntensity = 0.85;
-    if (t < 0.25 || t > 0.85) { skyHex = 0x0d1b2a; lightIntensity = 0.25; }
-    else if (t < 0.35) { skyHex = 0xffb703; lightIntensity = 0.65; }
-    else if (t > 0.75) { skyHex = 0xe85d04; lightIntensity = 0.7; }
+    let skyHex = 0x6ea8cd, sunIntensity = 0.52, hemiIntensity = 0.42;
+
+    if (t < 0.22 || t > 0.90) { // Deep Peaceful Night (22:00 - 05:15)
+      skyHex = 0x161f30;
+      sunIntensity = 0.22;
+      hemiIntensity = 0.25;
+      dirLight.color.setHex(0x7b9acc); // Cool moonlight
+    } else if (t < 0.32) { // Soft Golden Dawn (05:15 - 07:40)
+      skyHex = 0xc49c89;
+      sunIntensity = 0.44;
+      hemiIntensity = 0.36;
+      dirLight.color.setHex(0xffdfba);
+    } else if (t > 0.76) { // Cozy Warm Sunset (18:15 - 21:35)
+      skyHex = 0xb87363;
+      sunIntensity = 0.46;
+      hemiIntensity = 0.35;
+      dirLight.color.setHex(0xffaa70);
+    } else { // Clear Cozy Daytime (07:40 - 18:15)
+      skyHex = 0x6ea8cd;
+      sunIntensity = 0.52;
+      hemiIntensity = 0.42;
+      dirLight.color.setHex(0xfff8e7);
+    }
+
     scene.background.setHex(skyHex);
     scene.fog.color.setHex(skyHex);
-    dirLight.intensity = lightIntensity;
+    dirLight.intensity = sunIntensity;
+    hemiLight.intensity = hemiIntensity;
 
     if (windmillBlades) windmillBlades.rotation.z += dt * 1.5;
 
