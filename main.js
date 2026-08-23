@@ -122,7 +122,8 @@
    */
   async function loadGamesManifest() {
     try {
-      const response = await fetch('games.json');
+      // El manifest también se versiona para que el portal conozca la última revisión del juego.
+      const response = await fetch('games.json?v=2.3.0', { cache: 'no-store' });
       if (!response.ok) {
         throw new Error(`Error HTTP: ${response.status}`);
       }
@@ -342,7 +343,9 @@
     }
 
     const gamePath = game.carpeta.endsWith('/') ? `${game.carpeta}index.html` : `${game.carpeta}/index.html`;
-    gameIframe.src = gamePath;
+    // Cada lanzamiento usa la versión del catálogo para impedir que el iframe reutilice JS antiguo.
+    const gameVersion = encodeURIComponent(game.version || 'v1.0.0');
+    gameIframe.src = `${gamePath}?v=${gameVersion}`;
 
     gameOverlay.classList.remove('hidden');
     gameOverlay.setAttribute('aria-hidden', 'false');
