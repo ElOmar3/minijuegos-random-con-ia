@@ -153,7 +153,7 @@ Este proyecto está configurado para desplegarse automáticamente en **Cloudflar
 
 1. Clona el repositorio:
    ```bash
-   git clone https://github.com/ElOmar3/minijuegos-random-tiktok.git
+   git clone https://github.com/ElOmar3/minijuegos-random-con-ia.git
    ```
 2. Ábrelo con cualquier servidor local estático (como Live Server en VS Code o `npx serve .`).
 
