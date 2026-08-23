@@ -200,6 +200,8 @@
           <h2 id="current-game-title">Nombre del Juego</h2>
           <div class="game-meta-badges">
             <span id="current-game-ai" class="badge badge-ai" title="IA que programó este juego">🤖 Gemini 3.7 Flash</span>
+            <span id="current-game-version" class="badge badge-version" title="Versión actual">🏷️ v1.0.0</span>
+            <span id="current-game-updated" class="badge badge-updated" title="Fecha de última modificación">📅 23/08/2026</span>
             <span id="current-game-difficulty" class="badge badge-difficulty" title="Dificultad de desarrollo">🛠️ Creación: Fácil</span>
             <span id="current-game-tech" class="badge badge-tech" title="Tecnologías utilizadas">💻 JavaScript</span>
           </div>
@@ -207,6 +209,9 @@
       </div>
 
       <div class="game-overlay-actions">
+        <button id="changelog-btn" class="btn-action btn-changelog-header" title="Ver registro de cambios y novedades" aria-label="Ver cambios">
+          <span>📜</span> <span class="btn-action-text">Novedades</span>
+        </button>
         <button id="reload-game-btn" class="btn-action" title="Reiniciar juego" aria-label="Reiniciar juego">
           <span>🔄</span>
         </button>
@@ -225,6 +230,35 @@
         allow="autoplay; fullscreen; gamepad; xr-spatial-tracking; pointer-lock"
         loading="lazy">
       </iframe>
+    </div>
+  </div>
+
+  <!-- Modal Global de Registro de Cambios / Novedades -->
+  <div id="changelog-modal" class="portal-modal-overlay hidden" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="portal-modal-card">
+      <div class="portal-modal-header">
+        <div class="portal-modal-title-box">
+          <span class="portal-modal-icon">📜</span>
+          <div>
+            <h3 id="modal-game-title" class="portal-modal-title">Registro de Cambios</h3>
+            <div class="portal-modal-meta">
+              <span id="modal-game-version" class="badge badge-version">🏷️ v1.0.0</span>
+              <span id="modal-game-date" class="badge badge-updated">📅 23/08/2026</span>
+              <span id="modal-game-ai" class="badge badge-ai">🤖 IA</span>
+            </div>
+          </div>
+        </div>
+        <button id="close-changelog-btn" class="portal-modal-close" aria-label="Cerrar modal">✕</button>
+      </div>
+      <div class="portal-modal-body">
+        <h4 class="changelog-section-title">✨ Últimas Mejoras & Modificaciones:</h4>
+        <ul id="modal-changelog-list" class="changelog-list"></ul>
+      </div>
+      <div class="portal-modal-footer">
+        <button id="modal-play-btn" class="btn-play modal-btn-play">
+          <span>▶</span> Jugar Minijuego
+        </button>
+      </div>
     </div>
   </div>
 

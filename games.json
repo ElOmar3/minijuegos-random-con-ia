@@ -8,6 +8,14 @@
     "esfuerzo_ia": "Bajo (1/5)",
     "ia": "Gemini 3.7 Flash",
     "tecnologia": "JavaScript puro / Canvas / Web Audio",
+    "version": "v1.1.0",
+    "fecha_modificacion": "2026-08-22",
+    "cambios": [
+      "IA táctica con algoritmo de predicción de trayectoria de pelota.",
+      "Efectos visuales neón reactivos con estela de partículas y resplandor.",
+      "Sintetizador Web Audio API para efectos de sonido procedurales.",
+      "Adaptación responsiva con controles táctiles móviles por arrastre."
+    ],
     "carpeta": "games/neon-pong",
     "miniatura": "games/neon-pong/thumbnail.svg"
   },
@@ -20,6 +28,14 @@
     "esfuerzo_ia": "Alto (5/5)",
     "ia": "0x Alpha + Gemini 3.7 Flash",
     "tecnologia": "Three.js 3D / Web Audio / nipple.js",
+    "version": "v1.3.2",
+    "fecha_modificacion": "2026-08-22",
+    "cambios": [
+      "Motor 3D Three.js con sistema de oleadas dinámicas de zombis.",
+      "Controles táctiles en pantalla con joystick virtual nipple.js y botón de acción.",
+      "Iluminación ambiental dinámica con linterna frontal y sombras en tiempo real.",
+      "Sistema de armas con recarga, dispersión balística y audio espacial 3D."
+    ],
     "carpeta": "games/brote-cero",
     "miniatura": "games/brote-cero/thumbnail.png"
   },
@@ -32,6 +48,15 @@
     "esfuerzo_ia": "Alto (4/5)",
     "ia": "MiMo V2.5 + Gemini 3.7 Flash + GPT Terra",
     "tecnologia": "Three.js 3D / Web Audio / Modular JS",
+    "version": "v2.2.0",
+    "fecha_modificacion": "2026-08-23",
+    "cambios": [
+      "Modelos 3D detallados de alta definición: fresas rojas prominentes, trigo con espigas, zanahorias, tomates, calabazas, maíz y girasoles.",
+      "Iluminación pastel confortable y ciclo día/noche suave para evitar fatiga visual.",
+      "Sistema completo de granja: 16 parcelas, aspersores, animales de corral y perro acompañante con IA.",
+      "Molino con recetas de cocina, tienda, mochila, mejoras y persistencia segura de partidas.",
+      "Etiquetas de versión, fecha de actualización y registro de cambios integrado."
+    ],
     "carpeta": "games/farm-game",
     "miniatura": "games/farm-game/thumbnail.svg"
   }

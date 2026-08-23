@@ -796,6 +796,19 @@ body {
   border: 1px solid rgba(0, 240, 255, 0.35);
 }
 
+.badge-version {
+  background: rgba(251, 191, 36, 0.16);
+  color: #fde047;
+  border: 1px solid rgba(251, 191, 36, 0.45);
+  box-shadow: 0 0 8px rgba(251, 191, 36, 0.2);
+}
+
+.badge-updated {
+  background: rgba(56, 189, 248, 0.14);
+  color: #7dd3fc;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
 .game-card-title {
   font-family: var(--font-heading);
   font-size: 1.3rem;
@@ -808,12 +821,38 @@ body {
   font-size: 0.88rem;
   color: var(--text-muted);
   line-height: 1.55;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.2rem;
   flex: 1;
 }
 
 .game-card-footer {
   margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.btn-card-changelog {
+  width: 100%;
+  padding: 0.45rem 0.8rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: var(--transition-fast);
+}
+
+.btn-card-changelog:hover {
+  background: rgba(0, 240, 255, 0.1);
+  color: var(--cyan-neon);
+  border-color: rgba(0, 240, 255, 0.4);
 }
 
 .btn-play {
@@ -845,6 +884,166 @@ body {
 
 .btn-play:active {
   transform: translateY(0);
+}
+
+/* Modal de Registro de Cambios */
+.portal-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 6, 17, 0.85);
+  backdrop-filter: blur(20px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.portal-modal-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.portal-modal-card {
+  background: linear-gradient(160deg, rgba(14, 23, 47, 0.95), rgba(7, 12, 28, 0.98));
+  border: 1px solid var(--border-glow-cyan);
+  border-radius: var(--radius-md);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 240, 255, 0.25);
+  width: 100%;
+  max-width: 580px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalPopIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalPopIn {
+  from { transform: scale(0.92) translateY(10px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.portal-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.4rem 1.6rem;
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.portal-modal-title-box {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.portal-modal-icon {
+  font-size: 1.8rem;
+}
+
+.portal-modal-title {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 0.35rem;
+}
+
+.portal-modal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.portal-modal-close {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-dim);
+  font-size: 1.1rem;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.portal-modal-close:hover {
+  background: rgba(244, 63, 94, 0.2);
+  color: #fda4af;
+  border-color: rgba(244, 63, 94, 0.5);
+}
+
+.portal-modal-body {
+  padding: 1.5rem 1.6rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.changelog-section-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--cyan-neon);
+  margin-bottom: 1rem;
+  letter-spacing: 0.3px;
+}
+
+.changelog-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.changelog-list li {
+  position: relative;
+  padding-left: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  line-height: 1.5;
+}
+
+.changelog-list li::before {
+  content: '✦';
+  position: absolute;
+  left: 0;
+  color: var(--cyan-neon);
+  font-size: 0.85rem;
+}
+
+.portal-modal-footer {
+  padding: 1.2rem 1.6rem;
+  border-top: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.btn-changelog-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  background: rgba(0, 240, 255, 0.12);
+  color: #a5f3fc;
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.btn-changelog-header:hover {
+  background: rgba(0, 240, 255, 0.25);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
 }
 
 /* Estados Vacíos y de Carga */

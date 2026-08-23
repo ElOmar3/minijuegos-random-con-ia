@@ -40,6 +40,20 @@
   const reloadGameBtn = document.getElementById('reload-game-btn');
   const fullscreenBtn = document.getElementById('fullscreen-btn');
   const fullscreenIcon = document.getElementById('fullscreen-icon');
+  const currentGameVersion = document.getElementById('current-game-version');
+  const currentGameUpdated = document.getElementById('current-game-updated');
+  const changelogBtn = document.getElementById('changelog-btn');
+
+  // Elementos del Modal de Registro de Cambios
+  const changelogModal = document.getElementById('changelog-modal');
+  const modalGameTitle = document.getElementById('modal-game-title');
+  const modalGameVersion = document.getElementById('modal-game-version');
+  const modalGameDate = document.getElementById('modal-game-date');
+  const modalGameAi = document.getElementById('modal-game-ai');
+  const modalChangelogList = document.getElementById('modal-changelog-list');
+  const closeChangelogBtn = document.getElementById('close-changelog-btn');
+  const modalPlayBtn = document.getElementById('modal-play-btn');
+  let selectedModalGame = null;
 
   /**
    * SINTETIZADOR DE AUDIO UI (Web Audio API)
@@ -197,6 +211,19 @@
         }
       });
     });
+
+    const changelogButtons = gamesGrid.querySelectorAll('.btn-card-changelog');
+    changelogButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        playUiSound('click');
+        const gameId = btn.getAttribute('data-changelog-id');
+        const game = allGames.find(g => g.id === gameId);
+        if (game) {
+          openChangelogModal(game);
+        }
+      });
+    });
   }
 
   /**
@@ -206,6 +233,8 @@
     const dificultad = (game.dificultad || 'fácil').toLowerCase();
     const dificultadCreacion = game.dificultad_creacion || game.dificultad || 'Fácil';
     const miniatura = game.miniatura || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="225" viewBox="0 0 400 225"><rect width="400" height="225" fill="%230b1226"/><text x="50%" y="50%" fill="%2300f0ff" dominant-baseline="middle" text-anchor="middle" font-size="20">Minijuego</text></svg>';
+    const version = game.version || 'v1.0.0';
+    const fecha = game.fecha_modificacion || '2026-08-23';
 
     return `
       <article class="game-card" data-id="${escapeHtml(game.id)}">
@@ -226,6 +255,12 @@
                 🤖 ${escapeHtml(game.ia)}
               </span>
             ` : ''}
+            <span class="badge badge-version" title="Versión actual del minijuego">
+              🏷️ ${escapeHtml(version)}
+            </span>
+            <span class="badge badge-updated" title="Fecha de última modificación">
+              📅 ${escapeHtml(fecha)}
+            </span>
             <span class="badge badge-difficulty" data-difficulty="${escapeHtml(dificultad)}" title="Dificultad de desarrollo">
               🛠️ Creación: ${escapeHtml(dificultadCreacion)}
             </span>
@@ -238,6 +273,9 @@
           <h3 class="game-card-title">${escapeHtml(game.titulo)}</h3>
           <p class="game-card-desc">${escapeHtml(game.descripcion)}</p>
           <div class="game-card-footer">
+            <button class="btn-card-changelog" data-changelog-id="${escapeHtml(game.id)}" aria-label="Ver registro de cambios de ${escapeHtml(game.titulo)}">
+              <span>📜</span> Ver registro de cambios
+            </button>
             <button class="btn-play" data-game-id="${escapeHtml(game.id)}" aria-label="Jugar ${escapeHtml(game.titulo)}">
               <span>▶</span> Jugar Minijuego
             </button>
@@ -245,6 +283,32 @@
         </div>
       </article>
     `;
+  }
+
+  /**
+   * Abre el modal de novedades y registro de cambios
+   */
+  function openChangelogModal(game) {
+    if (!game) return;
+    selectedModalGame = game;
+    modalGameTitle.textContent = game.titulo;
+    modalGameVersion.textContent = `🏷️ ${game.version || 'v1.0.0'}`;
+    modalGameDate.textContent = `📅 ${game.fecha_modificacion || '2026-08-23'}`;
+    modalGameAi.textContent = `🤖 ${game.ia || 'IA'}`;
+
+    const cambios = Array.isArray(game.cambios) && game.cambios.length > 0
+      ? game.cambios
+      : ['Mejoras de rendimiento, estabilidad y jugabilidad general.'];
+
+    modalChangelogList.innerHTML = cambios.map(c => `<li>${escapeHtml(c)}</li>`).join('');
+    changelogModal.classList.remove('hidden');
+    changelogModal.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeChangelogModal() {
+    changelogModal.classList.add('hidden');
+    changelogModal.setAttribute('aria-hidden', 'true');
+    selectedModalGame = null;
   }
 
   /**
@@ -257,6 +321,14 @@
     
     if (currentGameAi) {
       currentGameAi.textContent = `🤖 ${game.ia || 'IA'}`;
+    }
+
+    if (currentGameVersion) {
+      currentGameVersion.textContent = `🏷️ ${game.version || 'v1.0.0'}`;
+    }
+
+    if (currentGameUpdated) {
+      currentGameUpdated.textContent = `📅 ${game.fecha_modificacion || '2026-08-23'}`;
     }
 
     if (currentGameDifficulty) {
@@ -408,6 +480,39 @@
     reloadGameBtn.addEventListener('click', reloadGame);
     fullscreenBtn.addEventListener('click', toggleFullscreen);
 
+    if (changelogBtn) {
+      changelogBtn.addEventListener('click', () => {
+        if (activeGame) openChangelogModal(activeGame);
+      });
+    }
+
+    if (closeChangelogBtn) {
+      closeChangelogBtn.addEventListener('click', () => {
+        playUiSound('click');
+        closeChangelogModal();
+      });
+    }
+
+    if (changelogModal) {
+      changelogModal.addEventListener('click', (e) => {
+        if (e.target === changelogModal) {
+          playUiSound('click');
+          closeChangelogModal();
+        }
+      });
+    }
+
+    if (modalPlayBtn) {
+      modalPlayBtn.addEventListener('click', () => {
+        if (selectedModalGame) {
+          playUiSound('launch');
+          const g = selectedModalGame;
+          closeChangelogModal();
+          openGame(g);
+        }
+      });
+    }
+
     document.addEventListener('fullscreenchange', () => {
       if (fullscreenIcon) {
         fullscreenIcon.textContent = document.fullscreenElement ? '✕' : '⛶';
@@ -415,8 +520,12 @@
     });
 
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !gameOverlay.classList.contains('hidden')) {
-        closeGame();
+      if (e.key === 'Escape') {
+        if (!changelogModal.classList.contains('hidden')) {
+          closeChangelogModal();
+        } else if (!gameOverlay.classList.contains('hidden')) {
+          closeGame();
+        }
       }
     });
   }
