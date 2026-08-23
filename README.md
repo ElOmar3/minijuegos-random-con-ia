@@ -77,6 +77,18 @@ Cada juego representa un desafío técnico y creativo donde se evalúan las capa
         <small><b>Stack:</b> Three.js 3D • Web Audio API • nipple.js</small>
       </td>
     </tr>
+    <tr>
+      <td>
+        <b>🌾 Granja Mágica 3D</b><br>
+        <code>/games/farm-game/</code>
+      </td>
+      <td><code>🤖 MiMo V2.5 + Gemini 3.7 Flash + OpenAI Codex</code></td>
+      <td>🟡 Media (3/5)</td>
+      <td>
+        Simulador 3D low-poly de granja: planta, riega, cosecha, cría animales, cocina y mejora tu terreno. OpenAI Codex aportó la mejora de jugabilidad, persistencia local y una carga autónoma del motor 3D.<br>
+        <small><b>Stack:</b> Three.js 3D local • JavaScript modular • Web Audio API</small>
+      </td>
+    </tr>
   </tbody>
 </table>
 
