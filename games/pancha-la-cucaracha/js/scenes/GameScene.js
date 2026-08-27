@@ -385,33 +385,82 @@
       const cy = this.scale.height / 2;
 
       this.add.rectangle(cx, cy, this.scale.width, this.scale.height, 0x14100c, 0.75)
-        .setDepth(90).setInteractive();
+        .setDepth(90);
 
-      this.add.text(cx, cy - 60, title, {
+      this.add.text(cx, cy - 80, title, {
         fontFamily: 'Trebuchet MS', fontSize: '52px', fontStyle: 'bold',
         color, stroke: '#14100c', strokeThickness: 8
       }).setOrigin(0.5).setDepth(91);
 
-      this.add.text(cx, cy + 10, subtitle, {
+      this.add.text(cx, cy - 10, subtitle, {
         fontFamily: 'Trebuchet MS', fontSize: '22px', color: '#e8dcc0', align: 'center'
       }).setOrigin(0.5).setDepth(91);
 
-      this.add.text(cx, cy + 90, 'Toca o pulsa una tecla para volver a jugar', {
-        fontFamily: 'Trebuchet MS', fontSize: '17px', color: '#8f8570'
-      }).setOrigin(0.5).setDepth(91);
+      // Botón "Volver a jugar" — siempre visible y clickeable
+      const btnW = 280;
+      const btnH = 64;
+      const btnY = cy + 90;
 
+      const btnBg = this.add.rectangle(cx, btnY, btnW, btnH, 0xffb340)
+        .setStrokeStyle(3, 0x3a2008)
+        .setDepth(91)
+        .setInteractive({ useHandCursor: true });
+
+      const btnText = this.add.text(cx, btnY, '▶  VOLVER A JUGAR', {
+        fontFamily: 'Trebuchet MS', fontSize: '24px', fontStyle: 'bold',
+        color: '#14100c'
+      }).setOrigin(0.5).setDepth(92);
+
+      // detener chanclas y movimiento del player
       if (this.chanclaSystem) this.chanclaSystem.active.length = 0;
       if (this.player && this.player.sprite.body) this.player.sprite.body.enable = false;
+      if (this.linternaSystem) {
+        for (const l of this.linternaSystem.linternas) {
+          this.tweens.killTweensOf(l.halo);
+          this.tweens.killTweensOf(l.glare);
+        }
+      }
 
-      this.time.delayedCall(1200, () => {
-        const restart = () => {
+      // pequeño parpadeo para llamar la atención
+      this.tweens.add({
+        targets: [btnBg, btnText],
+        scaleX: { from: 1, to: 1.04 },
+        scaleY: { from: 1, to: 1.04 },
+        duration: 700,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
+      });
+
+      // hover effects (escritorio)
+      btnBg.on('pointerover', () => {
+        btnBg.setFillStyle(0xffd07a);
+        btnBg.setScale(1.06);
+      });
+      btnBg.on('pointerout', () => {
+        btnBg.setFillStyle(0xffb340);
+        btnBg.setScale(1);
+      });
+
+      const restart = () => {
+        if (this._restarting) return;
+        this._restarting = true;
+        this.tweens.killAll();
+        if (this.inputSystem) {
           this.inputSystem.destroy();
           this.inputSystem = null;
-          this.scene.stop('HUD');
-          this.scene.restart();
-        };
+        }
+        this.scene.stop('HUD');
+        this.scene.restart();
+      };
+
+      btnBg.on('pointerdown', restart);
+
+      // atajo de teclado: cualquier tecla también reinicia
+      // (registramos después de un pequeño delay para no capturar la tecla
+      //  que causó la muerte/victoria)
+      this.time.delayedCall(1200, () => {
         this.input.keyboard.once('keydown', restart);
-        this.input.once('pointerdown', restart);
       });
     }
   };
