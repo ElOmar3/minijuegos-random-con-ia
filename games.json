@@ -1,64 +1,25 @@
 [
   {
-    "id": "neon-pong",
-    "titulo": "Neon Pong Arcade",
-    "descripcion": "El clásico Pong arcade con estética retro neón, IA táctica con predicción balística y partículas.",
-    "dificultad": "fácil",
-    "dificultad_creacion": "Fácil",
-    "esfuerzo_ia": "Bajo (1/5)",
-    "ia": "Gemini 3.7 Flash",
-    "tecnologia": "JavaScript puro / Canvas / Web Audio",
-    "version": "v1.1.0",
-    "fecha_modificacion": "2026-08-22",
-    "cambios": [
-      "IA táctica con algoritmo de predicción de trayectoria de pelota.",
-      "Efectos visuales neón reactivos con estela de partículas y resplandor.",
-      "Sintetizador Web Audio API para efectos de sonido procedurales.",
-      "Adaptación responsiva con controles táctiles móviles por arrastre."
-    ],
-    "carpeta": "games/neon-pong",
-    "miniatura": "games/neon-pong/thumbnail.svg"
-  },
-  {
-    "id": "brote-cero",
-    "titulo": "Brote Cero",
-    "descripcion": "FPS 3D de terror y supervivencia: sobrevive a oleadas de zombis con armas, linterna y audio posicional.",
+    "id": "pancha-la-cucaracha",
+    "titulo": "Pancha la Cucaracha",
+    "descripcion": "Sigilo en la cocina: esquiva las chanclas y linternas en 8 niveles de dificultad creciente.",
     "dificultad": "difícil",
-    "dificultad_creacion": "Difícil",
-    "esfuerzo_ia": "Alto (5/5)",
-    "ia": "0x Alpha + Gemini 3.7 Flash",
-    "tecnologia": "Three.js 3D / Web Audio / nipple.js",
-    "version": "v1.3.2",
-    "fecha_modificacion": "2026-08-22",
-    "cambios": [
-      "Motor 3D Three.js con sistema de oleadas dinámicas de zombis.",
-      "Controles táctiles en pantalla con joystick virtual nipple.js y botón de acción.",
-      "Iluminación ambiental dinámica con linterna frontal y sombras en tiempo real.",
-      "Sistema de armas con recarga, dispersión balística y audio espacial 3D."
-    ],
-    "carpeta": "games/brote-cero",
-    "miniatura": "games/brote-cero/thumbnail.png"
-  },
-  {
-    "id": "farm-game",
-    "titulo": "Granja Mágica 3D",
-    "descripcion": "Aventura de granja 3D low-poly en tercera persona: cultiva, riega, cosecha, cocina recetas y cuida animales con tu perro.",
-    "dificultad": "fácil",
-    "dificultad_creacion": "Media",
     "esfuerzo_ia": "Alto (4/5)",
-    "ia": "MiMo V2.5 + Gemini 3.7 Flash + GPT Terra + OpenAI Codex",
-    "tecnologia": "Three.js 3D / Web Audio / Modular JS",
-    "version": "v2.3.0",
-    "fecha_modificacion": "2026-08-23",
+    "ia": "0x Alpha",
+    "tecnologia": "Phaser 3 / nipple.js / JS modular",
+    "version": "v2.0.0",
+    "fecha_modificacion": "2026-08-27",
     "cambios": [
-      "Terreno reorganizado por OpenAI Codex: senderos exteriores, césped con variación, corral completo y árboles alejados de los edificios.",
-      "Modelos 3D detallados de alta definición: fresas rojas prominentes, trigo con espigas, zanahorias, tomates, calabazas, maíz y girasoles.",
-      "Iluminación pastel confortable y ciclo día/noche suave para evitar fatiga visual.",
-      "Sistema completo de granja: 16 parcelas, aspersores, animales de corral y perro acompañante con IA.",
-      "Molino con recetas de cocina, tienda, mochila, mejoras y persistencia segura de partidas.",
-      "Etiquetas de versión, fecha de actualización y registro de cambios integrado."
+      "Sprites y atlas procedurales completamente repulidos: cucaracha con patas articuladas, ojos compuestos, doble brillo y sombra propia; chancla con sombra dura, gradiente de cuero, trama y nudo; baldosa con juntas y vetas realistas; nido con halo cálido.",
+      "Sistema de linterna de muñeca con tres modos de movimiento: patrulla por waypoints, barrido angular y persecución lenta. En niveles avanzados hay hasta 3 linternas simultáneas.",
+      "Mecánica de exposición crítica: la barra de sigilo ahora es letal — si llega al máximo, Pancha muere y se muestra el icono de alerta.",
+      "Chanclas inteligentes con patrón 'aim': predicen la posición del jugador 0.35 s adelante y dibujan una flecha roja indicando la dirección.",
+      "Zonas de luz dinámicas con temporizador: aparecen y desaparecen rítmicamente, obligando a memorizar el ciclo.",
+      "8 niveles con dificultad progresiva: 1-3 sin linterna (tutorial e intermedios), 4-5 introducen linterna, 6 añade dos linternas simultáneas, 7 añade zonas dinámicas y chanclas que persiguen, 8 es el nivel jefe con linterna perseguidora + 2巡逻 + todas las chanclas.",
+      "Sistema de vidas (5) con indicadores en el HUD, partículas y anillos de impacto al recibir chanclazos, flash de cámara mejorado.",
+      "Reescrito íntegramente como scripts clásicos con namespace window.Pancha, compatible con file:// (doble clic en index.html) y HTTP."
     ],
-    "carpeta": "games/farm-game",
-    "miniatura": "games/farm-game/thumbnail.svg"
+    "carpeta": "games/pancha-la-cucaracha",
+    "miniatura": "games/pancha-la-cucaracha/thumbnail.svg"
   }
 ]

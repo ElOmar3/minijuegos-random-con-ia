@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Pancha la Cucaracha — Sigilo en la Cocina</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/nipplejs@0.10.2/dist/nipplejs.min.js"></script>
+</head>
+<body>
+  <div id="game-container"></div>
+
+  <!-- Zona del joystick virtual (móvil) -->
+  <div id="joystick-zone"></div>
+
+  <!-- Scripts clásicos en orden de dependencia (funciona con file:// y http://) -->
+  <script src="js/utils/constants.js"></script>
+  <script src="js/utils/levels.js"></script>
+  <script src="js/utils/textures.js"></script>
+  <script src="js/systems/InputSystem.js"></script>
+  <script src="js/systems/LightSystem.js"></script>
+  <script src="js/systems/LinternaSystem.js"></script>
+  <script src="js/systems/ChanclaSystem.js"></script>
+  <script src="js/systems/Player.js"></script>
+  <script src="js/scenes/BootScene.js"></script>
+  <script src="js/scenes/MenuScene.js"></script>
+  <script src="js/scenes/GameScene.js"></script>
+  <script src="js/scenes/HUDScene.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
