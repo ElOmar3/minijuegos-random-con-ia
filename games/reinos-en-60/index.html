@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Reinos en 60</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="game-shell">
+    <header class="hud">
+      <div class="brand"><span>♜</span><div><b>REINOS EN 60</b><small>DEFENSA DEL ÚLTIMO BASTIÓN</small></div></div>
+      <div class="stats">
+        <div class="stat time"><span>⌛</span><b id="time">60</b><small>SEG</small></div>
+        <div class="stat gold"><span>✦</span><b id="gold">120</b><small>ORO</small></div>
+        <div class="stat heart"><span>♥</span><b id="health">100</b><small>BASTIÓN</small></div>
+      </div>
+      <button class="round-btn" id="sound" aria-label="Alternar sonido">🔊</button>
+    </header>
+
+    <section class="battle-area">
+      <aside class="mission-panel">
+        <div class="wave-card"><span class="eyebrow">OLEADA</span><strong id="wave">0 / 6</strong><p id="waveHint">Prepara el reino</p></div>
+        <div class="objective"><b>OBJETIVO</b><p>Resiste hasta que llegue el amanecer.</p></div>
+        <div class="tips"><b>CONSEJO TÁCTICO</b><p id="tip">Las granjas financian una defensa que crece contigo.</p></div>
+      </aside>
+
+      <section class="kingdom-wrap" aria-label="Campo de batalla">
+        <div id="battlefield" class="battlefield" aria-label="Mapa de construcción"></div>
+        <div id="toast" class="toast" aria-live="polite"></div>
+        <div class="legend"><span class="enemy-dot"></span> Invasores <span class="ally-dot"></span> Defensas</div>
+      </section>
+
+      <aside class="intel-panel">
+        <div class="threat"><span class="eyebrow">AMENAZA</span><div class="threat-meter"><i id="threatFill"></i></div><b id="threatText">En calma</b></div>
+        <div class="build-readout"><span class="eyebrow">CONSTRUCCIÓN</span><b id="selectedName">Elige una estructura</b><p id="selectedDesc">Cada decisión cambia la supervivencia del reino.</p></div>
+        <button id="ability" class="ability" disabled><span>☄</span><div><b>FURIA REAL</b><small id="abilityText">Disponible al comenzar</small></div></button>
+      </aside>
+    </section>
+
+    <section class="build-bar" id="buildBar" aria-label="Edificios disponibles"></section>
+    <p class="help">Selecciona una estructura y toca una casilla libre. <kbd>1–5</kbd> construye rápido · <kbd>Espacio</kbd> usa Furia Real.</p>
+  </main>
+
+  <div id="startModal" class="overlay">
+    <section class="modal">
+      <div class="crest">♜</div>
+      <p class="eyebrow">UNA PARTIDA, UNA CORONA</p>
+      <h1>Reinos<br><em>en 60</em></h1>
+      <p class="intro">El ejército de ceniza avanza. Construye una economía, coloca defensas y evita que rompan el Bastión antes del amanecer.</p>
+      <div class="difficulty" role="group" aria-label="Dificultad">
+        <button data-difficulty="relaxed"><b>Crónica</b><small>Para aprender</small></button>
+        <button data-difficulty="normal" class="active"><b>Asedio</b><small>El reino estándar</small></button>
+        <button data-difficulty="hard"><b>Apocalipsis</b><small>Sin piedad</small></button>
+      </div>
+      <div class="how"><span>🏹 Torres disparan a distancia</span><span>⚒ Granjas y minas generan oro</span><span>🧱 Muros compran tiempo</span></div>
+      <button id="start" class="primary">DEFENDER EL REINO <span>→</span></button>
+      <p class="record">Mejor supervivencia: <b id="record">—</b></p>
+    </section>
+  </div>
+
+  <div id="endModal" class="overlay hidden">
+    <section class="modal result">
+      <div id="resultIcon" class="crest">♛</div>
+      <p id="resultLabel" class="eyebrow">EL AMANECER LLEGÓ</p>
+      <h2 id="resultTitle">¡El reino resiste!</h2>
+      <p id="resultCopy" class="intro"></p>
+      <div class="result-stats"><div><small>OLEADAS</small><b id="finalWaves">0</b></div><div><small>INVASORES</small><b id="finalKills">0</b></div><div><small>ORO GANADO</small><b id="finalGold">0</b></div></div>
+      <button id="again" class="primary">OTRA PARTIDA <span>↻</span></button>
+    </section>
+  </div>
+  <script src="../farm-game/three.min.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

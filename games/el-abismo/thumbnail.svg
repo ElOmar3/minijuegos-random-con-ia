@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#092742"/>
+      <stop offset="50%" stop-color="#041221"/>
+      <stop offset="100%" stop-color="#01060d"/>
+    </radialGradient>
+    <radialGradient id="ntiGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00ffff" stop-opacity="0.9"/>
+      <stop offset="40%" stop-color="#00b4d8" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#0077b6" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="beamGrad" x1="0%" y1="0%" x2="100%" y2="80%">
+      <stop offset="0%" stop-color="#caf0f8" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#0077b6" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="metalGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1b2a4a"/>
+      <stop offset="50%" stop-color="#2d4263"/>
+      <stop offset="100%" stop-color="#141e33"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Fondo Abismo Submarino -->
+  <rect width="600" height="400" fill="url(#bgGrad)" />
+
+  <!-- Fosa Marina Abisal y Grieta -->
+  <path d="M 0 340 Q 180 320 280 350 T 600 330 L 600 400 L 0 400 Z" fill="#020810" opacity="0.9" />
+  <path d="M 120 370 Q 300 360 480 380 L 600 400 L 0 400 Z" fill="#000205" />
+
+  <!-- Burbujas de Presión -->
+  <circle cx="120" cy="220" r="3" fill="#90e0ef" opacity="0.6" />
+  <circle cx="140" cy="180" r="5" fill="#90e0ef" opacity="0.4" />
+  <circle cx="450" cy="240" r="4" fill="#90e0ef" opacity="0.5" />
+  <circle cx="470" cy="190" r="6" fill="#90e0ef" opacity="0.3" />
+  <circle cx="280" cy="140" r="2" fill="#90e0ef" opacity="0.7" />
+
+  <!-- Haz de Luz / Reflector Submarino -->
+  <polygon points="170,190 40,360 260,360" fill="url(#beamGrad)" />
+
+  <!-- Base Submarina Deepcore Estilizada -->
+  <g transform="translate(130, 150)">
+    <!-- Patas / Estructura de anclaje -->
+    <rect x="20" y="70" width="10" height="45" fill="#1b2a4a" />
+    <rect x="190" y="70" width="10" height="45" fill="#1b2a4a" />
+    <!-- Módulos Habitacionales -->
+    <rect x="10" y="30" width="200" height="50" rx="12" fill="url(#metalGrad)" stroke="#00f0ff" stroke-width="2" />
+    <!-- Cúpula de Mando -->
+    <ellipse cx="110" cy="25" rx="45" ry="25" fill="#00b4d8" opacity="0.8" stroke="#00f0ff" stroke-width="2" />
+    <!-- Ojos de buey iluminados -->
+    <circle cx="40" cy="55" r="7" fill="#00f0ff" filter="url(#glow)" />
+    <circle cx="85" cy="55" r="7" fill="#00f0ff" filter="url(#glow)" />
+    <circle cx="135" cy="55" r="7" fill="#ffb700" filter="url(#glow)" />
+    <circle cx="180" cy="55" r="7" fill="#00f0ff" filter="url(#glow)" />
+  </g>
+
+  <!-- Criatura Alienígena NTI Bioluminiscente -->
+  <g transform="translate(420, 160)">
+    <!-- Halo de Luz NTI -->
+    <circle cx="0" cy="0" r="70" fill="url(#ntiGlow)" />
+    <!-- Cuerpo del Pseudópodo / Ser de Agua -->
+    <path d="M -25 -10 Q 0 -35 25 -10 Q 35 15 0 35 Q -35 15 -25 -10 Z" fill="#e0fbfc" filter="url(#glow)" />
+    <ellipse cx="0" cy="0" rx="18" ry="12" fill="#ffffff" />
+    <!-- Tentáculos de Agua Luminosa -->
+    <path d="M -15 25 Q -30 60 -10 90" stroke="#00ffff" stroke-width="3" fill="none" opacity="0.8" stroke-linecap="round" />
+    <path d="M 0 30 Q 10 70 0 105" stroke="#00ffff" stroke-width="4" fill="none" opacity="0.9" stroke-linecap="round" />
+    <path d="M 15 25 Q 30 60 15 90" stroke="#00ffff" stroke-width="3" fill="none" opacity="0.8" stroke-linecap="round" />
+  </g>
+
+  <!-- Título y Badges -->
+  <rect x="0" y="0" width="600" height="70" fill="linear-gradient(180deg, rgba(2,8,18,0.95) 0%, rgba(2,8,18,0) 100%)" />
+  <text x="30" y="45" font-family="'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="28" fill="#ffffff" letter-spacing="3">
+    EL ABISMO
+  </text>
+  <text x="180" y="45" font-family="'Courier New', monospace" font-weight="700" font-size="14" fill="#00f0ff" letter-spacing="2">
+    DEEPCORE PROTOCOL
+  </text>
+
+  <!-- Tag 1P / 2P CO-OP -->
+  <rect x="440" y="24" width="130" height="26" rx="6" fill="rgba(0, 240, 255, 0.2)" stroke="#00f0ff" stroke-width="1.5" />
+  <text x="505" y="42" font-family="'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="12" fill="#00f0ff" text-anchor="middle">
+    1P / 2P CO-OP
+  </text>
+</svg>

@@ -70,7 +70,7 @@ Cada juego representa un desafío técnico y creativo donde se evalúan las capa
         <b>🧟 Brote Cero</b><br>
         <code>/games/brote-cero/</code>
       </td>
-      <td><code>🤖 0x Alpha + Gemini 3.7 Flash</code></td>
+      <td><code>🤖 0x Alpha + Gemini 3.7 Flash + OpenAI Codex (Sol)</code></td>
       <td>🔴 Difícil (5/5)</td>
       <td>
         FPS 3D de supervivencia y terror contra oleadas infinitas. Incluye 6 tipos de zombis con habilidades especiales, 6 armas 3D, selector visual y audio espacial.<br>

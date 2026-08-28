@@ -123,7 +123,7 @@
   async function loadGamesManifest() {
     try {
       // El manifest también se versiona para que el portal conozca la última revisión del juego.
-      const response = await fetch('games.json?v=2.3.0', { cache: 'no-store' });
+      const response = await fetch('games.json?v=2.5.0', { cache: 'no-store' });
       if (!response.ok) {
         throw new Error(`Error HTTP: ${response.status}`);
       }

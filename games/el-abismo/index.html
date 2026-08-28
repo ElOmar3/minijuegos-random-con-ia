@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>El Abismo 3D: Deepcore Protocol</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Three.js 3D Engine -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    if (typeof THREE === 'undefined') {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"><\/script>');
+    }
+  </script>
+</head>
+<body>
+  <div class="game-wrapper">
+    <!-- Contenedor WebGL 3D -->
+    <div id="webgl-container"></div>
+
+    <!-- Barra de Estado HUD -->
+    <header class="hud-bar">
+      <div class="hud-gauges">
+        <div class="gauge-item" title="Soporte Vital de Oxígeno (Recarga en Sala Izquierda)">
+          <span class="gauge-label">💨 O2:</span>
+          <div class="gauge-bar-bg"><div class="gauge-fill fill-cyan" id="bar-oxygen"></div></div>
+          <span id="hud-oxygen-val">100%</span>
+        </div>
+
+        <div class="gauge-item" title="Integridad Estructural del Casco (Suelda las brechas rojas)">
+          <span class="gauge-label">🛡️ CASCO:</span>
+          <div class="gauge-bar-bg"><div class="gauge-fill fill-green" id="bar-hull"></div></div>
+          <span id="hud-hull-val">100%</span>
+        </div>
+
+        <div class="gauge-item" title="Energía del Reactor Térmico (Estabiliza en Sala Derecha)">
+          <span class="gauge-label">⚡ REACTOR:</span>
+          <div class="gauge-bar-bg"><div class="gauge-fill fill-amber" id="bar-reactor"></div></div>
+          <span id="hud-reactor-val">100%</span>
+        </div>
+
+        <div class="gauge-item" title="Bio-Sintonía NTI (Comunión en Piscina Lunar Central)">
+          <span class="gauge-label">💠 NTI:</span>
+          <div class="gauge-bar-bg"><div class="gauge-fill fill-nti" id="bar-harmony"></div></div>
+          <span id="hud-harmony-val">25%</span>
+        </div>
+
+        <div class="gauge-item" title="Inundación Global (Activa la Bomba en la Sala Inferior)">
+          <span class="gauge-label">🌊 AGUA:</span>
+          <span id="hud-water-val">0%</span>
+        </div>
+      </div>
+
+      <div class="hud-stats">
+        <span title="Tiempo Sobrevivido">⏱️ <span id="hud-timer-val">00:00</span></span>
+      </div>
+
+      <div class="hud-controls">
+        <button id="sound-btn" class="icon-btn" title="Sonido On/Off"><span id="sound-icon">🔊</span></button>
+        <button id="pause-btn" class="icon-btn" title="Pausa (P)">⏸️</button>
+      </div>
+    </header>
+
+    <!-- Caja de Radio Flotante Transmisora -->
+    <div id="radio-comms-box" class="radio-box hidden">
+      <div id="radio-speaker" class="radio-speaker">📡 [RADIO] CONTROL:</div>
+      <div id="radio-msg" class="radio-msg">Transmisión activa...</div>
+    </div>
+
+    <!-- Indicador de Acción Contextual 3D -->
+    <div id="action-prompt" class="action-prompt hidden">
+      <span class="prompt-icon">⚡</span>
+      <span id="prompt-txt">MANTÉN ACCIÓN PARA REPARAR</span>
+    </div>
+
+    <!-- Pantalla Inicial / Menú -->
+    <div class="overlay-screen" id="start-screen">
+      <div class="modal-content">
+        <h1 class="title-glow">EL ABISMO 3D</h1>
+        <p class="subtitle">DEEPCORE PROTOCOL — Supervivencia Submarina en 3D (7,000 m)</p>
+
+        <div class="lore-card">
+          Explora la estación submarina <strong>Deepcore en 3D</strong>. La presión del océano provoca brechas e inundaciones.
+          Trabajen en equipo o con la IA compañera para mantener la estación con vida y sintonizar con los seres inteligentes <strong>NTIs</strong>.
+        </div>
+
+        <!-- Guía de Salas y Funciones -->
+        <div class="station-guide">
+          <div class="guide-item">
+            <span class="guide-icon">💨</span>
+            <div><strong>Soporte Vital (Izq):</strong> Mantén acción en el compresor para regenerar Oxígeno.</div>
+          </div>
+          <div class="guide-item">
+            <span class="guide-icon">⚠️</span>
+            <div><strong>Fugas de Presión:</strong> Acércate a las balizas rojas y mantén acción para soldar brechas.</div>
+          </div>
+          <div class="guide-item">
+            <span class="guide-icon">🌊</span>
+            <div><strong>Bahía de Achique (Abajo):</strong> Usa la bomba para vaciar el agua de los compartimentos.</div>
+          </div>
+          <div class="guide-item">
+            <span class="guide-icon">💠</span>
+            <div><strong>Piscina Lunar (Centro):</strong> Sintoniza con el NTI para obtener el Escudo y Curación Total.</div>
+          </div>
+        </div>
+
+        <div class="team-grid">
+          <div class="member-box">
+            <h3>Bud Brigman (Supervisor)</h3>
+            <p>Soldador experto: repara brechas el doble de rápido.</p>
+            <div class="keys">P1: [W, A, S, D] + [E / ESPACIO]</div>
+          </div>
+          <div class="member-box amber">
+            <h3>Dra. Lindsey (Ingeniera)</h3>
+            <p>Especialista en O2, drenaje y bio-armonía NTI.</p>
+            <div class="keys">P2: [FLECHAS] + [ENTER / M]</div>
+          </div>
+        </div>
+
+        <div class="difficulty-select">
+          <label>Nivel de Presión y Dificultad:</label>
+          <div class="diff-buttons">
+            <button class="diff-btn" data-diff="easy">Fácil (600m)</button>
+            <button class="diff-btn active" data-diff="normal">Normal (2000m)</button>
+            <button class="diff-btn" data-diff="hard">Extrema (7000m)</button>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button class="primary-btn" id="btn-start-1p">🎮 1 JUGADOR (Compañero IA Autónomo + Tecla Tab)</button>
+          <button class="secondary-btn" id="btn-start-2p">👥 2 JUGADORES (Cooperativo Local)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pantalla de Pausa -->
+    <div class="overlay-screen hidden" id="pause-screen">
+      <div class="modal-content">
+        <h2 class="title-glow">SISTEMAS EN PAUSA</h2>
+        <p class="subtitle">Presión estabilizada temporalmente</p>
+        <button class="primary-btn" id="btn-resume">Continuar Inmersión</button>
+      </div>
+    </div>
+
+    <!-- Pantalla de Game Over -->
+    <div class="overlay-screen hidden" id="game-over-screen">
+      <div class="modal-content">
+        <h2 class="title-glow" style="color: #ff3b30; text-shadow: 0 0 15px #ff3b30;">PLATAFORMA PERDIDA</h2>
+        <p class="subtitle" id="game-over-reason">El abismo ha reclamado la estación Deepcore.</p>
+        <div class="action-buttons">
+          <button class="primary-btn" id="btn-restart-over">Intentar Inmersión de Nuevo</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pantalla de Victoria -->
+    <div class="overlay-screen hidden" id="victory-screen">
+      <div class="modal-content">
+        <h2 class="title-glow" style="color: #00ff88; text-shadow: 0 0 15px #00ff88;">COMUNIÓN ALCANZADA</h2>
+        <p class="subtitle">Las criaturas NTI han elevado la plataforma Deepcore a la superficie en paz.</p>
+        <p style="margin-bottom: 16px; font-family: monospace;">Tiempo de supervivencia: <strong id="victory-time">00:00</strong></p>
+        <div class="action-buttons">
+          <button class="primary-btn" id="btn-restart-vic">Jugar Otra Misión</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Capa de Controles Móviles -->
+    <div class="mobile-layer">
+      <div class="mobile-pad" id="mobile-p1">
+        <button class="mobile-btn" id="btn-p1-up">▲</button>
+        <div class="pad-row">
+          <button class="mobile-btn" id="btn-p1-left">◀</button>
+          <button class="mobile-btn act" id="btn-p1-act" title="Interactuar">⚡</button>
+          <button class="mobile-btn" id="btn-p1-right">▶</button>
+        </div>
+        <button class="mobile-btn" id="btn-p1-down">▼</button>
+      </div>
+
+      <button class="mobile-switch-btn" id="btn-touch-switch">Cambiar PJ (Tab)</button>
+
+      <div class="mobile-pad hidden" id="mobile-p2">
+        <button class="mobile-btn" id="btn-p2-up">▲</button>
+        <div class="pad-row">
+          <button class="mobile-btn" id="btn-p2-left">◀</button>
+          <button class="mobile-btn act" id="btn-p2-act" title="Interactuar">⚡</button>
+          <button class="mobile-btn" id="btn-p2-right">▶</button>
+        </div>
+        <button class="mobile-btn" id="btn-p2-down">▼</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts en Orden de Dependencia -->
+  <script src="js/constants.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/world3d.js"></script>
+  <script src="js/entities.js"></script>
+  <script src="js/station.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

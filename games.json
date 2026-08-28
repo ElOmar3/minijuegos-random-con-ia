@@ -1,5 +1,108 @@
 [
   {
+    "id": "reinos-en-60",
+    "titulo": "Reinos en 60",
+    "descripcion": "Estrategia de defensa 3D: construye una economía, levanta murallas y resiste seis oleadas antes del amanecer.",
+    "dificultad": "medio",
+    "dificultad_creacion": "Media",
+    "esfuerzo_ia": "Alto (4/5)",
+    "ia": "OpenAI Codex",
+    "tecnologia": "Three.js 3D / JavaScript puro / Web Audio API",
+    "version": "v1.1.0",
+    "fecha_modificacion": "2026-08-27",
+    "cambios": [
+      "Campo de batalla 3D isométrico con edificios y enemigos low-poly.",
+      "Economía de granjas y minas, torres, cuarteles y murallas destruibles.",
+      "Tres dificultades, habilidad Furia Real, controles de teclado y soporte táctil.",
+      "Audio procedural y récord local de invasores derrotados."
+    ],
+    "carpeta": "games/reinos-en-60",
+    "miniatura": "games/reinos-en-60/thumbnail.svg"
+  },
+  {
+    "id": "el-abismo",
+    "titulo": "El Abismo 3D: Deepcore Protocol",
+    "descripcion": "Supervivencia y gestión submarina 3D cooperativa/individual inspirada en The Abyss: mantén el oxígeno, repara brechas de alta presión y comunícate con las criaturas bioluminiscentes NTIs en un entorno 3D inmersivo.",
+    "dificultad": "medio",
+    "dificultad_creacion": "Media",
+    "esfuerzo_ia": "Alto (5/5)",
+    "ia": "Gemini 3.7 Flash",
+    "tecnologia": "Three.js 3D / Web Audio / JS Modular",
+    "version": "v2.0.0",
+    "fecha_modificacion": "2026-08-27",
+    "cambios": [
+      "Motor 3D completo Three.js con estación submarina Deepcore, iluminación volumétrica y niebla abisal.",
+      "Modelos 3D de buzos (Bud y Lindsey) con linternas SpotLight en tiempo real y trajes presurizados.",
+      "Criatura alienígena NTI 3D bioluminiscente con tentáculos ondulantes en la piscina lunar.",
+      "Simulación de inundación física 3D con planos de agua dinámicos y balizas de emergencia.",
+      "IA compañera autónoma con sistema de navegación por waypoints espaciales y soporte 1P/2P."
+    ],
+    "carpeta": "games/el-abismo",
+    "miniatura": "games/el-abismo/thumbnail.svg"
+  },
+  {
+    "id": "neon-pong",
+    "titulo": "Neon Pong Arcade",
+    "descripcion": "El clásico Pong arcade con estética retro neón, IA táctica con predicción balística y partículas.",
+    "dificultad": "fácil",
+    "dificultad_creacion": "Fácil",
+    "esfuerzo_ia": "Bajo (1/5)",
+    "ia": "Gemini 3.7 Flash",
+    "tecnologia": "JavaScript puro / Canvas / Web Audio",
+    "version": "v1.1.0",
+    "fecha_modificacion": "2026-08-22",
+    "cambios": [
+      "IA táctica con algoritmo de predicción de trayectoria de pelota.",
+      "Efectos visuales neón reactivos con estela de partículas y resplandor.",
+      "Sintetizador Web Audio API para efectos de sonido procedurales.",
+      "Adaptación responsiva con controles táctiles móviles por arrastre."
+    ],
+    "carpeta": "games/neon-pong",
+    "miniatura": "games/neon-pong/thumbnail.svg"
+  },
+  {
+    "id": "brote-cero",
+    "titulo": "Brote Cero",
+    "descripcion": "FPS 3D de terror y supervivencia: sobrevive a oleadas de zombis con armas, linterna y audio posicional.",
+    "dificultad": "difícil",
+    "dificultad_creacion": "Difícil",
+    "esfuerzo_ia": "Alto (5/5)",
+    "ia": "0x Alpha + Gemini 3.7 Flash + OpenAI Codex (Sol)",
+    "tecnologia": "Three.js 3D / Web Audio / nipple.js",
+    "version": "v1.4.0",
+    "fecha_modificacion": "2026-08-27",
+    "cambios": [
+      "Arquitectura modular ES nativa con Game, GameLoop, GameState y gestión correcta de pausa, visibilidad y recursos.",
+      "ZombieAI con navegación A*, WaveDirector y SpawnDirector para hordas progresivas y apariciones seguras.",
+      "Economía, mejoras de las seis armas, estaciones, puerta comprable, drops y tres objetivos dinámicos integrados.",
+      "Sistema de builds de partida con 19 perks, selección 1 de 3, stacks, incompatibilidades y controles móvil/escritorio."
+    ],
+    "carpeta": "games/brote-cero",
+    "miniatura": "games/brote-cero/thumbnail.png"
+  },
+  {
+    "id": "farm-game",
+    "titulo": "Granja Mágica 3D",
+    "descripcion": "Aventura de granja 3D low-poly en tercera persona: cultiva, riega, cosecha, cocina recetas y cuida animales con tu perro.",
+    "dificultad": "fácil",
+    "dificultad_creacion": "Media",
+    "esfuerzo_ia": "Alto (4/5)",
+    "ia": "MiMo V2.5 + Gemini 3.7 Flash + GPT Terra + OpenAI Codex",
+    "tecnologia": "Three.js 3D / Web Audio / Modular JS",
+    "version": "v2.3.0",
+    "fecha_modificacion": "2026-08-23",
+    "cambios": [
+      "Terreno reorganizado por OpenAI Codex: senderos exteriores, césped con variación, corral completo y árboles alejados de los edificios.",
+      "Modelos 3D detallados de alta definición: fresas rojas prominentes, trigo con espigas, zanahorias, tomates, calabazas, maíz y girasoles.",
+      "Iluminación pastel confortable y ciclo día/noche suave para evitar fatiga visual.",
+      "Sistema completo de granja: 16 parcelas, aspersores, animales de corral y perro acompañante con IA.",
+      "Molino con recetas de cocina, tienda, mochila, mejoras y persistencia segura de partidas.",
+      "Etiquetas de versión, fecha de actualización y registro de cambios integrado."
+    ],
+    "carpeta": "games/farm-game",
+    "miniatura": "games/farm-game/thumbnail.svg"
+  },
+  {
     "id": "pancha-la-cucaracha",
     "titulo": "Pancha la Cucaracha",
     "descripcion": "Sigilo en la cocina: esquiva las chanclas y linternas en 8 niveles de dificultad creciente.",
